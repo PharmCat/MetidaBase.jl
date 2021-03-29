@@ -12,6 +12,10 @@ abstract type AbstractCovarianceType end
 
 abstract type AbstractLMMDataBlocks end
 
+# Data
+
+abstract type AbstractData end
+
 # MetidaFreq.jl
 
 

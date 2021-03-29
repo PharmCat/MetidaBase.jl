@@ -5,5 +5,6 @@ __precompile__()
 module MetidaBase
 
 include("abstracttype.jl")
+include("types.jl")
 
 end
