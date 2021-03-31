@@ -2,5 +2,5 @@
 # MetidaFreq.jl
 
 struct DataSet{T <: AbstractData}
-    data::T
+    data::AbstractVector{T}
 end
