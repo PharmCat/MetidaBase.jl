@@ -16,6 +16,10 @@ abstract type AbstractLMMDataBlocks end
 
 abstract type AbstractData end
 
+abstract type AbstractResultData <: AbstractData end
+
+abstract type AbstractIdData <: AbstractData end
+
 # MetidaFreq.jl
 
 

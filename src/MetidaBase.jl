@@ -4,9 +4,11 @@
 __precompile__()
 module MetidaBase
 
-using StatsModels, StatsBase
+    using StatsModels
 
-include("abstracttype.jl")
-include("types.jl")
+    import Base: getindex
+
+    include("abstracttype.jl")
+    include("types.jl")
 
 end
