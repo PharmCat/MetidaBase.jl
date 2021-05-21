@@ -10,5 +10,6 @@ function Base.getindex(ds::DataSet, ind)
 end
 
 struct Proportion <: AbstractData
-    p::Rational{Int64}
+    x::Int
+    n::Int
 end

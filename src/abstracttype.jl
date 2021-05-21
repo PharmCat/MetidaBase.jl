@@ -18,9 +18,14 @@ abstract type AbstractData end
 
 abstract type AbstractResultData <: AbstractData end
 
+# All have field: id::Dict
 abstract type AbstractIdData <: AbstractData end
 
 # MetidaFreq.jl
 
 
 # MetidaNCA.jl
+# All have fields: time::Vector, obs::Vector
+#
+#
+abstract type AbstractSubject <: AbstractIdData end
