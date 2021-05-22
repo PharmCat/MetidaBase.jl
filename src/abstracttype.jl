@@ -26,6 +26,4 @@ abstract type AbstractIdData <: AbstractData end
 
 # MetidaNCA.jl
 # All have fields: time::Vector, obs::Vector
-#
-#
 abstract type AbstractSubject <: AbstractIdData end
