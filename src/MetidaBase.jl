@@ -6,7 +6,7 @@ module MetidaBase
 
     using StatsModels, Tables
     import Tables: istable, columnaccess, columns, getcolumn, columnnames
-    import Base: getindex, length
+    import Base: getindex, length, ht_keyindex
 
     include("abstracttype.jl")
     include("types.jl")
