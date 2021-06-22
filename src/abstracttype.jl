@@ -16,7 +16,10 @@ abstract type AbstractLMMDataBlocks end
 
 abstract type AbstractData end
 
+# All have field: id::Dict, result::Dict
 abstract type AbstractResultData <: AbstractData end
+
+
 
 # All have field: id::Dict
 abstract type AbstractIdData <: AbstractData end
@@ -27,3 +30,5 @@ abstract type AbstractIdData <: AbstractData end
 # MetidaNCA.jl
 # All have fields: time::Vector, obs::Vector
 abstract type AbstractSubject <: AbstractIdData end
+
+abstract type AbstractSubjectResult{AbstractSubject} <: AbstractResultData end
