@@ -31,4 +31,5 @@ abstract type AbstractIdData <: AbstractData end
 # All have fields: time::Vector, obs::Vector
 abstract type AbstractSubject <: AbstractIdData end
 
+# All have field: id::Dict, result::Dict, subject::AbstractSubject
 abstract type AbstractSubjectResult{AbstractSubject} <: AbstractResultData end

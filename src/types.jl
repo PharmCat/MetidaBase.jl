@@ -11,9 +11,9 @@ Tables.columnaccess(t::MetidaTable) = true
 
 Tables.columns(t::MetidaTable) = t
 
-Tables.getcolumn(t, i::Int) = t.table[i]
+Tables.getcolumn(t::MetidaTable, i::Int) = t.table[i]
 
-Tables.getcolumn(t, nm::Symbol) = t.table[nm]
+Tables.getcolumn(t::MetidaTable, nm::Symbol) = t.table[nm]
 
 Tables.columnnames(t::MetidaTable) = collect(keys(t.table))
 
