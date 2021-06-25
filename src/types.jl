@@ -37,7 +37,7 @@ function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResul
     end
     v = Vector{type}(undef, length(ds))
     @inbounds for i = 1:length(ds)
-        v = getindormiss(ds[i].result, ind)
+        v[i] = getindormiss(ds[i].result, ind)
     end
     v
 end
