@@ -23,9 +23,25 @@ struct DataSet{T <: AbstractData}
     data::Vector{T}
 end
 
-function Base.getindex(ds::DataSet, ind)
+function Base.getindex(ds::DataSet, ind::Int)
     ds.data[ind]
 end
+Base.first(ds::DataSet) = first(ds.data)
+
+function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
+    type = typeof(getindormiss(ds[1].result, ind))
+    if length(ds) > 1
+        @inbounds for i = 1:length(ds)
+            type = promote_type(type, typeof(getindormiss(ds[i].result, ind)))
+        end
+    end
+    v = Vector{type}(undef, length(ds))
+    @inbounds for i = 1:length(ds)
+        v = getindormiss(ds[i].result, ind)
+    end
+    v
+end
+
 
 function Base.length(ds::DataSet)
     length(ds.data)
