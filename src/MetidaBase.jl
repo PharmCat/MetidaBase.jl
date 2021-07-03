@@ -4,8 +4,12 @@
 __precompile__(true)
 module MetidaBase
 
-    using StatsModels, Tables
+    using Tables, StatsModels
+
     import Tables: istable, columnaccess, columns, getcolumn, columnnames
+
+    import StatsModels: StatisticalModel
+
     import Base: getindex, length, ht_keyindex
 
     include("abstracttype.jl")

@@ -29,17 +29,15 @@ end
 Base.first(ds::DataSet) = first(ds.data)
 
 function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
-    type = typeof(getindormiss(ds[1].result, ind))
-    if length(ds) > 1
-        @inbounds for i = 1:length(ds)
-            type = promote_type(type, typeof(getindormiss(ds[i].result, ind)))
-        end
-    end
-    v = Vector{type}(undef, length(ds))
+    v = Vector{Any}(undef, length(ds))
     @inbounds for i = 1:length(ds)
         v[i] = getindormiss(ds[i].result, ind)
     end
     v
+end
+
+function Base.getindex(ds::DataSet{T}, col::Int, ind) where T <: AbstractResultData
+    getindormiss(ds[col].result, ind)
 end
 
 
@@ -47,9 +45,10 @@ function Base.length(ds::DataSet)
     length(ds.data)
 end
 
-function getindormiss(d, i)
-    ind = ht_keyindex(d, i)
-    if ind > 0 return d.vals[ind]  else return missing  end
+function getindormiss(d::Dict{K, V}, i::K)::Union{V, Missing} where K where V
+    ind::Int = ht_keyindex(d, i)
+    if ind > 0 return d.vals[ind]  end
+    missing
 end
 function islessdict(a::Dict{A1,A2}, b::Dict{B1,B2}, k::Union{AbstractVector, Set}) where A1 where A2 where B1 where B2
     l = length(k)
