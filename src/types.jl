@@ -33,7 +33,7 @@ end
 Base.first(ds::DataSet) = first(ds.data)
 
 function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
-    v = Vector{Any}(undef, length(ds))
+    v = Vector{Float64}(undef, length(ds))
     @inbounds for i = 1:length(ds)
         v[i] = getindormiss(ds[i].result, ind)
     end
@@ -43,6 +43,19 @@ end
 function Base.getindex(ds::DataSet{T}, col::Int, ind) where T <: AbstractResultData
     getindormiss(ds[col].result, ind)
 end
+
+function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
+    v = Vector{Any}(undef, length(ds))
+    @inbounds for i = 1:length(ds)
+        v[i] = getindormiss(ds[i].id, ind)
+    end
+    v
+end
+
+function getid(ds::DataSet{T}, col::Int, ind) where T <: AbstractIdData
+    getindormiss(ds[col].id, ind)
+end
+
 
 
 function Base.length(ds::DataSet)
