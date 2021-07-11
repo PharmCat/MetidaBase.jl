@@ -4,13 +4,13 @@
 __precompile__(true)
 module MetidaBase
 
-    using Tables, StatsModels
+    using Tables, StatsModels, PrettyTables
 
     import Tables: istable, columnaccess, columns, getcolumn, columnnames
 
     import StatsModels: StatisticalModel
 
-    import Base: getindex, length, ht_keyindex
+    import Base: getindex, length, ht_keyindex, show
 
     include("abstracttype.jl")
     include("types.jl")

@@ -17,6 +17,10 @@ Tables.getcolumn(t::MetidaTable, nm::Symbol) = t.table[nm]
 
 Tables.columnnames(t::MetidaTable) = collect(keys(t.table))
 
+function Base.show(io::IO, table::MetidaTable)
+    pretty_table(io, table)
+end
+
 # All
 
 struct DataSet{T <: AbstractData}
