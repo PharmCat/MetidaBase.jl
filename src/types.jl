@@ -36,8 +36,18 @@ Tables.getcolumn(t::MetidaTable, nm::Symbol) = t.table[nm]
 
 Tables.columnnames(t::MetidaTable) = collect(keys(t.table))
 
+function Base.getindex(t::MetidaTable, col::Colon, ind::T) where T <: Union{Symbol, Int}
+    Tables.getcolumn(t, ind)
+end
+function Base.getindex(t::MetidaTable, row::Int, ind::T) where T <: Union{Symbol, Int}
+    Tables.getcolumn(t, ind)[row]
+end
+function Base.setindex!(t::MetidaTable, val, row::Int, ind::T) where T <: Union{Symbol, Int}
+    Tables.getcolumn(t, ind)[row] = val
+end
+
 function Base.show(io::IO, table::MetidaTable)
-    pretty_table(io, table)
+    pretty_table(io, table; tf = PrettyTables.tf_compact)
 end
 
 # All
