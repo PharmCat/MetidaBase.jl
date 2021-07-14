@@ -5,6 +5,25 @@ struct MetidaTable{T <: NamedTuple}
     table::T
 end
 
+function metida_table(args...; names = nothing)
+    if length(args) > 1
+        e1 = length(args[1])
+        i = 2
+        @inbounds for i = 2:length(args)
+            length(args[i]) == e1 || error("Length not equal")
+        end
+    end
+    if isnothing(names)
+        names = Tuple(Symbol.("x" .* string.(collect(1:length(args)))))
+    else
+        if length(args) != length(names) error("Length args and names not equal") end
+        if !(typeof(names) <: Tuple)
+            names = Tuple(names)
+        end
+    end
+    MetidaBase.MetidaTable(NamedTuple{names}(args))
+end
+
 Tables.istable(t::MetidaTable) = true
 
 Tables.columnaccess(t::MetidaTable) = true
