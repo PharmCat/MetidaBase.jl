@@ -10,7 +10,7 @@ module MetidaBase
 
     import StatsModels: StatisticalModel
 
-    import Base: getindex, length, ht_keyindex, show
+    import Base: getindex, length, ht_keyindex, show, pushfirst!
 
     include("abstracttype.jl")
     include("types.jl")

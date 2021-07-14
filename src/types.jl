@@ -34,6 +34,8 @@ Tables.getcolumn(t::MetidaTable, i::Int) = t.table[i]
 
 Tables.getcolumn(t::MetidaTable, nm::Symbol) = t.table[nm]
 
+Tables.getcolumn(t::MetidaTable, ::Type{T}, col::Int, nm::Symbol) where {T} = t[:, col]
+
 Tables.columnnames(t::MetidaTable) = collect(keys(t.table))
 
 function Base.getindex(t::MetidaTable, col::Colon, ind::T) where T <: Union{Symbol, Int}
@@ -44,6 +46,21 @@ function Base.getindex(t::MetidaTable, row::Int, ind::T) where T <: Union{Symbol
 end
 function Base.setindex!(t::MetidaTable, val, row::Int, ind::T) where T <: Union{Symbol, Int}
     Tables.getcolumn(t, ind)[row] = val
+end
+function Base.pushfirst!(t::MetidaTable, row::AbstractVector)
+    if length(row) != length(keys(t.table)) error("Size not equal") end
+    i = 1
+    for i = 1:length(row)
+        pushfirst!(t.table[i], row[i])
+    end
+end
+function Base.pushfirst!(t::MetidaTable, row::NamedTuple)
+    kt = keys(t.table)
+    kr = keys(row)
+    if !issetequal(kt, kr) error("Size not equal") end
+    for i in kt
+        pushfirst!(t.table[i], row[i])
+    end
 end
 
 function Base.show(io::IO, table::MetidaTable)
