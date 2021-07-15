@@ -4,11 +4,11 @@
 __precompile__(true)
 module MetidaBase
 
-    using Tables, StatsModels, PrettyTables
+    using Tables, PrettyTables, Reexport
+    import StatsModels: StatisticalModel
+    @reexport using StatsModels
 
     import Tables: istable, columnaccess, columns, getcolumn, columnnames
-
-    import StatsModels: StatisticalModel
 
     import Base: getindex, length, ht_keyindex, show, pushfirst!
 
