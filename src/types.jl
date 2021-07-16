@@ -23,7 +23,9 @@ function metida_table(args...; names = nothing)
     end
     MetidaBase.MetidaTable(NamedTuple{names}(args))
 end
-
+################################################################################
+# TABLES
+################################################################################
 Tables.istable(t::MetidaTable) = true
 
 Tables.columnaccess(t::MetidaTable) = true
@@ -38,15 +40,20 @@ Tables.getcolumn(t::MetidaTable, ::Type{T}, col::Int, nm::Symbol) where {T} = t[
 
 Tables.columnnames(t::MetidaTable) = collect(keys(t.table))
 
+################################################################################
+# BASE
+################################################################################
 function Base.getindex(t::MetidaTable, col::Colon, ind::T) where T <: Union{Symbol, Int}
     Tables.getcolumn(t, ind)
 end
 function Base.getindex(t::MetidaTable, row::Int, ind::T) where T <: Union{Symbol, Int}
     Tables.getcolumn(t, ind)[row]
 end
+
 function Base.setindex!(t::MetidaTable, val, row::Int, ind::T) where T <: Union{Symbol, Int}
     Tables.getcolumn(t, ind)[row] = val
 end
+
 function Base.pushfirst!(t::MetidaTable, row::AbstractVector)
     if length(row) != length(keys(t.table)) error("Size not equal") end
     i = 1
@@ -70,16 +77,19 @@ function Base.show(io::IO, table::MetidaTable)
 end
 
 # All
-
+################################################################################
+# DATASET
+################################################################################
 struct DataSet{T <: AbstractData}
     data::Vector{T}
 end
+################################################################################
+# BASE
+################################################################################
 
 function Base.getindex(ds::DataSet, ind::Int)
     ds.data[ind]
 end
-Base.first(ds::DataSet) = first(ds.data)
-
 function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
     v = Vector{Float64}(undef, length(ds))
     @inbounds for i = 1:length(ds)
@@ -87,22 +97,11 @@ function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResul
     end
     v
 end
-
 function Base.getindex(ds::DataSet{T}, col::Int, ind) where T <: AbstractResultData
     getindormiss(ds[col].result, ind)
 end
 
-function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
-    v = Vector{Any}(undef, length(ds))
-    @inbounds for i = 1:length(ds)
-        v[i] = getindormiss(ds[i].id, ind)
-    end
-    v
-end
-
-function getid(ds::DataSet{T}, col::Int, ind) where T <: AbstractIdData
-    getindormiss(ds[col].id, ind)
-end
+Base.first(ds::DataSet) = first(ds.data)
 
 function Base.length(ds::DataSet)
     length(ds.data)
@@ -111,11 +110,13 @@ end
 function Base.iterate(iter::DataSet)
     return Base.iterate(iter.data)
 end
-
 function Base.iterate(iter::DataSet, i::Int)
     return Base.iterate(iter.data, i)
 end
 
+################################################################################
+# BASE.SORT
+################################################################################
 function getindormiss(d::Dict{K, V}, i::K)::Union{V, Missing} where K where V
     ind::Int = ht_keyindex(d, i)
     if ind > 0 return d.vals[ind]  end
@@ -140,6 +141,50 @@ function Base.sort!(a::DataSet{T}, k; alg::Base.Algorithm = QuickSort, lt=nothin
     sort!(a.data;  alg = alg, lt = lt, by = by, rev = rev, order = order)
     a
 end
+
+################################################################################
+# SELF
+################################################################################
+
+function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
+    v = Vector{Any}(undef, length(ds))
+    @inbounds for i = 1:length(ds)
+        v[i] = getindormiss(ds[i].id, ind)
+    end
+    v
+end
+
+function getid(ds::DataSet{T}, col::Int, ind) where T <: AbstractIdData
+    getindormiss(ds[col].id, ind)
+end
+
+function uniqueidlist(data::DataSet{T}, list::AbstractVector{Symbol}) where T <: AbstractIdData
+    dl = Vector{Dict}(undef, 0)
+    for i in data
+        if list ⊆ keys(i.id)
+            subd = Dict(k => i.id[k] for k in list)
+            if subd ∉ dl push!(dl, subd) end
+        end
+    end
+    dl
+end
+function uniqueidlist(data::DataSet{T}, list::Symbol) where T <: AbstractIdData
+    dl = Vector{Dict}(undef, 0)
+    for i in data
+        if list in keys(i.id)
+            subd = Dict(list => i.id[list])
+            if subd ∉ dl push!(dl, subd) end
+        end
+    end
+    dl
+end
+
+function subset(data::DataSet, sort::Dict)
+    inds = findall(x-> sort ⊆ x.id, data.data)
+    if length(inds) > 0 return DataSet(data.data[inds]) end
+    nothing
+end
+################################################################################
 
 # MetidaFreq.jl
 
