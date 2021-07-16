@@ -53,6 +53,7 @@ function Base.pushfirst!(t::MetidaTable, row::AbstractVector)
     for i = 1:length(row)
         pushfirst!(t.table[i], row[i])
     end
+    t
 end
 function Base.pushfirst!(t::MetidaTable, row::NamedTuple)
     kt = keys(t.table)
@@ -61,6 +62,7 @@ function Base.pushfirst!(t::MetidaTable, row::NamedTuple)
     for i in kt
         pushfirst!(t.table[i], row[i])
     end
+    t
 end
 
 function Base.show(io::IO, table::MetidaTable)
@@ -102,10 +104,16 @@ function getid(ds::DataSet{T}, col::Int, ind) where T <: AbstractIdData
     getindormiss(ds[col].id, ind)
 end
 
-
-
 function Base.length(ds::DataSet)
     length(ds.data)
+end
+
+function Base.iterate(iter::DataSet)
+    return Base.iterate(iter.data)
+end
+
+function Base.iterate(iter::DataSet, i::Int)
+    return Base.iterate(iter.data, i)
 end
 
 function getindormiss(d::Dict{K, V}, i::K)::Union{V, Missing} where K where V
