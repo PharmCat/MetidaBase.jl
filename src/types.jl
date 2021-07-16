@@ -83,6 +83,12 @@ end
 struct DataSet{T <: AbstractData}
     data::Vector{T}
 end
+
+function getindormiss(d::Dict{K}, i::K) where K
+    ind::Int = ht_keyindex(d, i)
+    if ind > 0 return d.vals[ind]  end
+    missing
+end
 ################################################################################
 # BASE
 ################################################################################
@@ -90,12 +96,12 @@ end
 function Base.getindex(ds::DataSet, ind::Int)
     ds.data[ind]
 end
+
+function getresultindex(subj, ind::Symbol)
+    getindormiss(subj.result, ind)
+end
 function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
-    v = Vector{Float64}(undef, length(ds))
-    @inbounds for i = 1:length(ds)
-        v[i] = getindormiss(ds[i].result, ind)
-    end
-    v
+    getresultindex.(ds.data, ind)
 end
 function Base.getindex(ds::DataSet{T}, col::Int, ind) where T <: AbstractResultData
     getindormiss(ds[col].result, ind)
@@ -117,11 +123,6 @@ end
 ################################################################################
 # BASE.SORT
 ################################################################################
-function getindormiss(d::Dict{K, V}, i::K)::Union{V, Missing} where K where V
-    ind::Int = ht_keyindex(d, i)
-    if ind > 0 return d.vals[ind]  end
-    missing
-end
 function islessdict(a::Dict{A1,A2}, b::Dict{B1,B2}, k::Union{AbstractVector, Set}) where A1 where A2 where B1 where B2
     l = length(k)
     av = Vector{Union{Missing, A2}}(undef, l)
@@ -146,17 +147,21 @@ end
 # SELF
 ################################################################################
 
-function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
-    v = Vector{Any}(undef, length(ds))
-    @inbounds for i = 1:length(ds)
-        v[i] = getindormiss(ds[i].id, ind)
-    end
-    v
+function getid(data::T, ind) where T <: AbstractIdData
+    getindormiss(data.id, ind)
+end
+function getid(data::T, ind) where T <: AbstractSubjectResult
+    getindormiss(data.subject.id, ind)
 end
 
-function getid(ds::DataSet{T}, col::Int, ind) where T <: AbstractIdData
-    getindormiss(ds[col].id, ind)
+
+function getid(ds::DataSet{T}, col::Int, ind) where T <: AbstractData
+    getid(ds[col], ind)
 end
+function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractData
+    getid.(ds.data, ind)
+end
+
 
 function uniqueidlist(data::DataSet{T}, list::AbstractVector{Symbol}) where T <: AbstractIdData
     dl = Vector{Dict}(undef, 0)
