@@ -8,8 +8,6 @@ on:
       - 'README.md'
       - '.github/**'
       - 'docs/**'
-      - 'validation/**'
-      - 'test/validation**'
       - 'change.log'
       - '.gitignore'
   pull_request:
