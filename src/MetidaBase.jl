@@ -6,7 +6,7 @@ module MetidaBase
 
     using Tables, PrettyTables, Reexport
 
-    @reexport using StatsModels
+    #@reexport using StatsModels
 
     import StatsModels: StatisticalModel
     import Tables: istable, columnaccess, columns, getcolumn, columnnames
