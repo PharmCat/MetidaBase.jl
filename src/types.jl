@@ -147,8 +147,8 @@ end
 function islessdict(a::Dict, b::Dict, k)
     isless(getindormiss(a, k), getindormiss(b, k))
 end
-function Base.sort!(a::DataSet{T}, k; alg::Base.Algorithm = QuickSort, lt=nothing, by=nothing, rev::Bool=false, order::Base.Ordering = Base.Forward) where T <: AbstractIdData
-    if isnothing(by) by = x -> x.id end
+function Base.sort!(a::DataSet{T}, k; alg::Base.Algorithm = QuickSort, lt=nothing, by=nothing, rev::Bool=false, order::Base.Ordering = Base.Forward) where T <: Union{AbstractIdData, AbstractSubjectResult}
+    if isnothing(by) by = x -> getid(x) end
     if isnothing(lt) lt = (x, y) -> islessdict(x, y, k) end
     sort!(a.data;  alg = alg, lt = lt, by = by, rev = rev, order = order)
     a
@@ -158,29 +158,24 @@ end
 # SELF
 ################################################################################
 
-#function getid(data::T, ind) where T <: AbstractIdData
-#    getindormiss(data.id, ind)
-#end
-function getid_safe(subj::T, ind) where T <: AbstractIdData
-    getindormiss(subj.id, ind)
-end
-function getid_unsafe(subj::T, ind) where T <: AbstractIdData
-    subj.id[ind]
-end
+getid_safe(subj::AbstractIdData, ind) = getindormiss(subj.id, ind)
 
-#function getid(data::T, ind) where T <: AbstractSubjectResult
-#    getindormiss(data.subject.id, ind)
-#end
-function getid_safe(subj::T, ind) where T <: AbstractSubjectResult
-    getindormiss(subj.subject.id, ind)
-end
-function getid_unsafe(subj::T, ind) where T <: AbstractSubjectResult
-    subj.subject.id[ind]
-end
+getid_unsafe(subj::AbstractIdData, ind) = subj.id[ind]
 
+getid_safe(subj::AbstractSubjectResult, ind) = getindormiss(subj.subject.id, ind)
+
+getid_unsafe(subj::AbstractSubjectResult, ind) = subj.subject.id[ind]
+
+getid(subj::AbstractIdData, ind) = getid_safe(subj, ind)
+
+getid(subj::AbstractSubjectResult, ind) = getid_safe(subj, ind)
+
+getid(subj::AbstractIdData) = subj.id
+
+getid(subj::AbstractSubjectResult) = subj.subject.id
 
 function getid(ds::DataSet{T}, col::Int, ind) where T <: Union{AbstractIdData, AbstractSubjectResult}
-    getid_safe(ds[col], ind)
+    getid(ds[col], ind)
 end
 function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
     @inbounds for i in Base.OneTo(length(ds))
