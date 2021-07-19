@@ -2,6 +2,7 @@ using MetidaBase
 using Test
 
 @testset "MetidaBase.jl" begin
+    io       = IOBuffer();
     mt = MetidaBase.metida_table([1,2,3], ["a", "b", "c"], names = (:a, :b))
     pushfirst!(mt, [0, " "])
     @test mt[1, :a] == 0
@@ -10,8 +11,8 @@ using Test
     ntr = NamedTuple{(:b, :a)}(["d", 10])
     pushfirst!(mt, ntr)
     @test mt[1, :b] == "d"
-
-
+    mt[:, :b]
+    Base.show(io, mt)
 
     struct ExampleIDStruct <: MetidaBase.AbstractSubject
         #time
@@ -33,7 +34,7 @@ using Test
     MetidaBase.getid(exidds[3])[:a] = 2
     MetidaBase.getid(exidds[2])[:b] = 2
     MetidaBase.getid(exidds[3])[:b] = 3
-
+    MetidaBase.getid(exidds, :, :a)
 
     exrsdsv = Vector{ExampleResultStruct}(undef, length(exidds))
 
@@ -49,8 +50,14 @@ using Test
     @test MetidaBase.getid(exidds[3], :a) == 2
     sort!(exidds, :a)
     @test MetidaBase.getid(exidds[3], :a) == 3
+    MetidaBase.getid(exrsds, :, :a)
 
     sort!(exrsds, :a)
+
+    MetidaBase.uniqueidlist(exidds, [:a])
+    MetidaBase.uniqueidlist(exidds, :a)
+
+    MetidaBase.subset(exidds, Dict(:a => 1))
     #println(exrsds[:, :r1])
 
     #println(MetidaBase.getid(exrsds, :, :a1))
