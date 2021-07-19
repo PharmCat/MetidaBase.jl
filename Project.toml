@@ -12,7 +12,7 @@ Reexport = "189a3867-3050-52da-a836-e630ba90ab69"
 
 [compat]
 StatsBase = "0.29, 0.30, 0.31, 0.32, 0.33"
-StatsModels = "0.6"
+StatsModels = "0.6.23"
 Tables = "1"
 PrettyTables = "1"
 Reexport = "0.2, 1.0, 1.1"
