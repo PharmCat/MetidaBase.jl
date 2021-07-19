@@ -84,7 +84,7 @@ struct DataSet{T <: AbstractData}
     data::Vector{T}
 end
 
-function getindormiss(d::Dict{K}, i::K) where K
+@inline function getindormiss(d::Dict{K}, i::K) where K
     ind::Int = ht_keyindex(d, i)
     if ind > 0 return d.vals[ind]  end
     missing
@@ -96,15 +96,26 @@ end
 function Base.getindex(ds::DataSet, ind::Int)
     ds.data[ind]
 end
-
-function getresultindex(subj, ind::Symbol)
+@inline function getresultindex_safe(subj::T, ind::Symbol) where T <: AbstractResultData
     getindormiss(subj.result, ind)
 end
-function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
-    getresultindex.(ds.data, ind)
+@inline function getresultindex_unsafe(subj::T, ind::Symbol) where T <: AbstractResultData
+    subj.result[ind]
 end
+
+#@inline function getresultindex(subj, ind::Symbol)
+#    getindormiss(subj.result, ind)
+#end
+
 function Base.getindex(ds::DataSet{T}, col::Int, ind) where T <: AbstractResultData
-    getindormiss(ds[col].result, ind)
+    getresultindex_safe(ds[col], ind)
+end
+function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
+    @inbounds for i in Base.OneTo(length(ds))
+        if Base.ht_keyindex(ds.data[i].result, ind) < 1 return getresultindex_safe.(ds.data, ind) end
+    end
+    getresultindex_unsafe.(ds.data, ind)
+    #getresultindex.(ds.data, ind)
 end
 
 Base.first(ds::DataSet) = first(ds.data)
@@ -147,19 +158,41 @@ end
 # SELF
 ################################################################################
 
-function getid(data::T, ind) where T <: AbstractIdData
-    getindormiss(data.id, ind)
+#function getid(data::T, ind) where T <: AbstractIdData
+#    getindormiss(data.id, ind)
+#end
+function getid_safe(subj::T, ind) where T <: AbstractIdData
+    getindormiss(subj.id, ind)
 end
-function getid(data::T, ind) where T <: AbstractSubjectResult
-    getindormiss(data.subject.id, ind)
+function getid_unsafe(subj::T, ind) where T <: AbstractIdData
+    subj.id[ind]
+end
+
+#function getid(data::T, ind) where T <: AbstractSubjectResult
+#    getindormiss(data.subject.id, ind)
+#end
+function getid_safe(subj::T, ind) where T <: AbstractSubjectResult
+    getindormiss(subj.subject.id, ind)
+end
+function getid_unsafe(subj::T, ind) where T <: AbstractSubjectResult
+    subj.subject.id[ind]
 end
 
 
-function getid(ds::DataSet{T}, col::Int, ind) where T <: AbstractData
-    getid(ds[col], ind)
+function getid(ds::DataSet{T}, col::Int, ind) where T <: Union{AbstractIdData, AbstractSubjectResult}
+    getid_safe(ds[col], ind)
 end
-function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractData
-    getid.(ds.data, ind)
+function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
+    @inbounds for i in Base.OneTo(length(ds))
+        if Base.ht_keyindex(ds.data[i].id, ind) < 1 return getid_safe.(ds.data, ind) end
+    end
+    getid_unsafe.(ds.data, ind)
+end
+function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractSubjectResult
+    @inbounds for i in Base.OneTo(length(ds))
+        if Base.ht_keyindex(ds.data[i].subject.id, ind) < 1 return getid_safe.(ds.data, ind) end
+    end
+    getid_unsafe.(ds.data, ind)
 end
 
 
