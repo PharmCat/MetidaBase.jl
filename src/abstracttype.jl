@@ -41,17 +41,4 @@ abstract type AbstractSubject <: AbstractIdData end
 abstract type AbstractSubjectResult{AbstractSubject} <: AbstractIDResult{AbstractSubject} end
 
 
-# Descript
-
-#=
-struct IdData{T, K, V} <: AbstractIdData
-    obs::T
-    id::Dict{K, V}
-end
-
-
-struct Descriptives{T} <: AbstractIDResult{T}
-    subject::T
-    result::Dict
-end
-=#
+# Descriptive 

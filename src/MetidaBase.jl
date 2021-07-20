@@ -15,5 +15,6 @@ module MetidaBase
 
     include("abstracttype.jl")
     include("types.jl")
+    include("utils.jl")
 
 end
