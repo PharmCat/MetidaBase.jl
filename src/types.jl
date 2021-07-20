@@ -84,6 +84,9 @@ struct DataSet{T <: AbstractData}
     ds::Vector{T}
 end
 
+function getdata(d::DataSet)
+    d.ds
+end
 @inline function getindormiss(d::Dict{K}, i::K) where K
     ind::Int = ht_keyindex(d, i)
     if ind > 0 return d.vals[ind]  end

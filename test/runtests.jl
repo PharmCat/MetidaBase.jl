@@ -30,6 +30,10 @@ using Test
         exiddsv[i] = ExampleIDStruct(Dict(:a => 1, :b => 1))
     end
     exidds = MetidaBase.DataSet(exiddsv)
+
+    @test length(MetidaBase.getdata(exidds)) == length(exidds)
+
+
     MetidaBase.getid(exidds[2])[:a] = 3
     MetidaBase.getid(exidds[3])[:a] = 2
     MetidaBase.getid(exidds[2])[:b] = 2
