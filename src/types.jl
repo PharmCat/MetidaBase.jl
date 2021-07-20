@@ -81,7 +81,7 @@ end
 # DATASET
 ################################################################################
 struct DataSet{T <: AbstractData}
-    data::Vector{T}
+    ds::Vector{T}
 end
 
 @inline function getindormiss(d::Dict{K}, i::K) where K
@@ -93,42 +93,42 @@ end
 # BASE
 ################################################################################
 
-function Base.getindex(ds::DataSet, ind::Int)
-    ds.data[ind]
+function Base.getindex(d::DataSet, ind::Int)
+    d.ds[ind]
 end
-@inline function getresultindex_safe(subj::T, ind::Symbol) where T <: AbstractResultData
-    getindormiss(subj.result, ind)
+@inline function getresultindex_safe(rd::T, ind::Symbol) where T <: AbstractResultData
+    getindormiss(rd.result, ind)
 end
-@inline function getresultindex_unsafe(subj::T, ind::Symbol) where T <: AbstractResultData
-    subj.result[ind]
+@inline function getresultindex_unsafe(rd::T, ind::Symbol) where T <: AbstractResultData
+    rd.result[ind]
 end
 
 #@inline function getresultindex(subj, ind::Symbol)
 #    getindormiss(subj.result, ind)
 #end
 
-function Base.getindex(ds::DataSet{T}, col::Int, ind) where T <: AbstractResultData
-    getresultindex_safe(ds[col], ind)
+function Base.getindex(d::DataSet{T}, col::Int, ind) where T <: AbstractResultData
+    getresultindex_safe(d[col], ind)
 end
-function Base.getindex(ds::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
-    @inbounds for i in Base.OneTo(length(ds))
-        if Base.ht_keyindex(ds.data[i].result, ind) < 1 return getresultindex_safe.(ds.data, ind) end
+function Base.getindex(d::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
+    @inbounds for i in Base.OneTo(length(d))
+        if Base.ht_keyindex(d.ds[i].result, ind) < 1 return getresultindex_safe.(d.ds, ind) end
     end
-    getresultindex_unsafe.(ds.data, ind)
+    getresultindex_unsafe.(d.ds, ind)
     #getresultindex.(ds.data, ind)
 end
 
-Base.first(ds::DataSet) = first(ds.data)
+Base.first(d::DataSet) = first(d.ds)
 
-function Base.length(ds::DataSet)
-    length(ds.data)
+function Base.length(d::DataSet)
+    length(d.ds)
 end
 
-function Base.iterate(iter::DataSet)
-    return Base.iterate(iter.data)
+function Base.iterate(d::DataSet)
+    return Base.iterate(d.ds)
 end
-function Base.iterate(iter::DataSet, i::Int)
-    return Base.iterate(iter.data, i)
+function Base.iterate(d::DataSet, i::Int)
+    return Base.iterate(d.ds, i)
 end
 
 ################################################################################
@@ -147,53 +147,53 @@ end
 function islessdict(a::Dict, b::Dict, k)
     isless(getindormiss(a, k), getindormiss(b, k))
 end
-function Base.sort!(a::DataSet{T}, k; alg::Base.Algorithm = QuickSort, lt=nothing, by=nothing, rev::Bool=false, order::Base.Ordering = Base.Forward) where T <: Union{AbstractIdData, AbstractSubjectResult}
+function Base.sort!(d::DataSet{T}, k; alg::Base.Algorithm = QuickSort, lt=nothing, by=nothing, rev::Bool=false, order::Base.Ordering = Base.Forward) where T <: Union{AbstractIdData, AbstractIDResult}
     if isnothing(by) by = x -> getid(x) end
     if isnothing(lt) lt = (x, y) -> islessdict(x, y, k) end
-    sort!(a.data;  alg = alg, lt = lt, by = by, rev = rev, order = order)
-    a
+    sort!(d.ds;  alg = alg, lt = lt, by = by, rev = rev, order = order)
+    d
 end
 
 ################################################################################
 # SELF
 ################################################################################
 
-getid_safe(subj::AbstractIdData, ind) = getindormiss(subj.id, ind)
+getid_safe(idd::AbstractIdData, ind) = getindormiss(idd.id, ind)
 
-getid_unsafe(subj::AbstractIdData, ind) = subj.id[ind]
+getid_unsafe(idd::AbstractIdData, ind) = idd.id[ind]
 
-getid_safe(subj::AbstractSubjectResult, ind) = getindormiss(subj.subject.id, ind)
+getid_safe(asr::AbstractSubjectResult, ind) = getindormiss(asr.data.id, ind)
 
-getid_unsafe(subj::AbstractSubjectResult, ind) = subj.subject.id[ind]
+getid_unsafe(asr::AbstractSubjectResult, ind) = asr.data.id[ind]
 
-getid(subj::AbstractIdData, ind) = getid_safe(subj, ind)
+getid(idd::AbstractIdData, ind) = getid_safe(idd, ind)
 
-getid(subj::AbstractSubjectResult, ind) = getid_safe(subj, ind)
+getid(asr::AbstractSubjectResult, ind) = getid_safe(asr, ind)
 
-getid(subj::AbstractIdData) = subj.id
+getid(idd::AbstractIdData) = idd.id
 
-getid(subj::AbstractSubjectResult) = subj.subject.id
+getid(asr::AbstractSubjectResult) = asr.data.id
 
-function getid(ds::DataSet{T}, col::Int, ind) where T <: Union{AbstractIdData, AbstractSubjectResult}
-    getid(ds[col], ind)
+function getid(d::DataSet{T}, col::Int, ind) where T <: Union{AbstractIdData, AbstractSubjectResult}
+    getid(d[col], ind)
 end
-function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
-    @inbounds for i in Base.OneTo(length(ds))
-        if Base.ht_keyindex(ds.data[i].id, ind) < 1 return getid_safe.(ds.data, ind) end
+function getid(d::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
+    @inbounds for i in Base.OneTo(length(d))
+        if Base.ht_keyindex(d.ds[i].id, ind) < 1 return getid_safe.(d.ds, ind) end
     end
-    getid_unsafe.(ds.data, ind)
+    getid_unsafe.(d.ds, ind)
 end
-function getid(ds::DataSet{T}, col::Colon, ind) where T <: AbstractSubjectResult
-    @inbounds for i in Base.OneTo(length(ds))
-        if Base.ht_keyindex(ds.data[i].subject.id, ind) < 1 return getid_safe.(ds.data, ind) end
+function getid(d::DataSet{T}, col::Colon, ind) where T <: AbstractSubjectResult
+    @inbounds for i in Base.OneTo(length(d))
+        if Base.ht_keyindex(d.ds[i].data.id, ind) < 1 return getid_safe.(d.ds, ind) end
     end
-    getid_unsafe.(ds.data, ind)
+    getid_unsafe.(d.ds, ind)
 end
 
 
-function uniqueidlist(data::DataSet{T}, list::AbstractVector{Symbol}) where T <: AbstractIdData
+function uniqueidlist(d::DataSet{T}, list::AbstractVector{Symbol}) where T <: AbstractIdData
     dl = Vector{Dict}(undef, 0)
-    for i in data
+    for i in d
         if list ⊆ keys(i.id)
             subd = Dict(k => i.id[k] for k in list)
             if subd ∉ dl push!(dl, subd) end
@@ -201,9 +201,9 @@ function uniqueidlist(data::DataSet{T}, list::AbstractVector{Symbol}) where T <:
     end
     dl
 end
-function uniqueidlist(data::DataSet{T}, list::Symbol) where T <: AbstractIdData
+function uniqueidlist(d::DataSet{T}, list::Symbol) where T <: AbstractIdData
     dl = Vector{Dict}(undef, 0)
-    for i in data
+    for i in d
         if list in keys(i.id)
             subd = Dict(list => i.id[list])
             if subd ∉ dl push!(dl, subd) end
@@ -212,9 +212,9 @@ function uniqueidlist(data::DataSet{T}, list::Symbol) where T <: AbstractIdData
     dl
 end
 
-function subset(data::DataSet, sort::Dict)
-    inds = findall(x-> sort ⊆ x.id, data.data)
-    if length(inds) > 0 return DataSet(data.data[inds]) end
+function subset(d::DataSet, sort::Dict)
+    inds = findall(x-> sort ⊆ x.id, d.ds)
+    if length(inds) > 0 return DataSet(d.ds[inds]) end
     nothing
 end
 ################################################################################

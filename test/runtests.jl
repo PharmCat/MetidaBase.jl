@@ -21,7 +21,7 @@ using Test
     end
 
     struct ExampleResultStruct{T} <: MetidaBase.AbstractSubjectResult{T}
-        subject::T
+        data::T
         result::Dict
     end
 
