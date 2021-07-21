@@ -4,7 +4,9 @@
 struct MetidaTable{T <: NamedTuple}
     table::T
 end
-
+function metida_table(table::NamedTuple)
+    MetidaTable(table)
+end
 function metida_table(args...; names = nothing)
     if length(args) > 1
         e1 = length(args[1])
@@ -165,19 +167,19 @@ getid_safe(idd::AbstractIdData, ind) = getindormiss(idd.id, ind)
 
 getid_unsafe(idd::AbstractIdData, ind) = idd.id[ind]
 
-getid_safe(asr::AbstractSubjectResult, ind) = getindormiss(asr.data.id, ind)
+getid_safe(asr::AbstractIDResult, ind) = getindormiss(asr.data.id, ind)
 
-getid_unsafe(asr::AbstractSubjectResult, ind) = asr.data.id[ind]
+getid_unsafe(asr::AbstractIDResult, ind) = asr.data.id[ind]
 
 getid(idd::AbstractIdData, ind) = getid_safe(idd, ind)
 
-getid(asr::AbstractSubjectResult, ind) = getid_safe(asr, ind)
+getid(asr::AbstractIDResult, ind) = getid_safe(asr, ind)
 
 getid(idd::AbstractIdData) = idd.id
 
-getid(asr::AbstractSubjectResult) = asr.data.id
+getid(asr::AbstractIDResult) = asr.data.id
 
-function getid(d::DataSet{T}, col::Int, ind) where T <: Union{AbstractIdData, AbstractSubjectResult}
+function getid(d::DataSet{T}, col::Int, ind) where T <: Union{AbstractIdData, AbstractIDResult}
     getid(d[col], ind)
 end
 function getid(d::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
@@ -186,7 +188,7 @@ function getid(d::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
     end
     getid_unsafe.(d.ds, ind)
 end
-function getid(d::DataSet{T}, col::Colon, ind) where T <: AbstractSubjectResult
+function getid(d::DataSet{T}, col::Colon, ind) where T <: AbstractIDResult
     @inbounds for i in Base.OneTo(length(d))
         if Base.ht_keyindex(d.ds[i].data.id, ind) < 1 return getid_safe.(d.ds, ind) end
     end
