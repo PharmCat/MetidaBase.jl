@@ -13,6 +13,9 @@ function indsdict!(d::Dict{T}, cdata::Tuple) where T
     d
 end
 
+function sortbyvec!(a, vec)
+    sort!(a, by = x -> findfirst(y -> x == y, vec))
+end
 
 isnanormissing(x::Number) = isnan(x)
 isnanormissing(x::Missing) = true

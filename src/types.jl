@@ -223,7 +223,35 @@ function subset(d::DataSet, sort::Dict)
     nothing
 end
 ################################################################################
-
+# metida_table from DataSet{AbstractIDResult}
+################################################################################
+function metida_table(obj::DataSet{RD}; order = nothing, results = nothing, ids = nothing) where RD <: AbstractIDResult
+    idset  = Set(keys(first(obj).data.id))
+    resset = Set(keys(first(obj).result))
+    if length(obj) > 1
+        for i = 2:length(obj)
+            union!(idset,  Set(keys(obj[i].data.id)))
+            union!(resset, Set(keys(obj[i].result)))
+        end
+    end
+    if !isnothing(results)
+        if isa(results, Symbol) results = [results] end
+        if isa(results, String) results = [Symbol(results)] end
+        ressetl = isnothing(order) ? collect(intersect(resset, results)) : sortbyvec!(collect(intersect(resset, results)), order)
+    else
+        ressetl = isnothing(order) ? collect(resset) : sortbyvec!(collect(resset), order)
+    end
+    if !isnothing(ids)
+        if isa(ids, Symbol) ids = [ids] end
+        if isa(ids, String) ids = [Symbol(ids)] end
+        ids ⊆ idset || error("Some id not in dataset!")
+        idset = intersect(idset, ids)
+    end
+    mt1 = MetidaBase.metida_table((getid(obj, :, c) for c in idset)...; names = idset)
+    mt2 = MetidaBase.metida_table((obj[:, c] for c in ressetl)...; names = ressetl)
+    MetidaTable(merge(mt1.table, mt2.table))
+end
+################################################################################
 # MetidaFreq.jl
 
 struct Proportion <: AbstractData
