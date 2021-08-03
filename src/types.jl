@@ -82,7 +82,7 @@ end
 ################################################################################
 # DATASET
 ################################################################################
-struct DataSet{T <: AbstractData}
+struct DataSet{T <: AbstractData} <: AbstractDataSet{AbstractData}
     ds::Vector{T}
 end
 

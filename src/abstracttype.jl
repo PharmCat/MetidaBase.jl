@@ -16,6 +16,8 @@ abstract type AbstractLMMDataBlocks end
 
 abstract type AbstractData end
 
+abstract type AbstractDataSet{AbstractData} end
+
 # All have field: id::Dict
 abstract type AbstractIdData <: AbstractData end
 
@@ -41,4 +43,4 @@ abstract type AbstractSubject <: AbstractIdData end
 abstract type AbstractSubjectResult{AbstractSubject} <: AbstractIDResult{AbstractSubject} end
 
 
-# Descriptive 
+# Descriptive

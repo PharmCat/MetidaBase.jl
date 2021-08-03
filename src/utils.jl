@@ -12,3 +12,7 @@ function indsdict!(d::Dict{T}, cdata::Tuple) where T
     end
     d
 end
+
+
+isnanormissing(x::Number) = isnan(x)
+isnanormissing(x::Missing) = true
