@@ -220,7 +220,7 @@ end
 function subset(d::DataSet, sort::Dict)
     inds = findall(x-> sort ⊆ x.id, d.ds)
     if length(inds) > 0 return DataSet(d.ds[inds]) end
-    nothing
+    []
 end
 ################################################################################
 # metida_table from DataSet{AbstractIDResult}
