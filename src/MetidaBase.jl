@@ -11,10 +11,11 @@ module MetidaBase
     import StatsModels: StatisticalModel
     import Tables: istable, columnaccess, columns, getcolumn, columnnames
 
-    import Base: getindex, length, ht_keyindex, show, pushfirst!, iterate
+    import Base: getindex, length, ht_keyindex, show, pushfirst!, iterate, size
 
     include("abstracttype.jl")
     include("types.jl")
     include("utils.jl")
+    include("iterators.jl")
 
 end

@@ -17,9 +17,19 @@ function sortbyvec!(a, vec)
     sort!(a, by = x -> findfirst(y -> x == y, vec))
 end
 
+################################################################################
+################################################################################
+
 isnanormissing(x::Number) = isnan(x)
+isnanormissing(x::AbstractFloat) = isnan(x) 
 isnanormissing(x::Missing) = true
 
+ispositive(::Missing) = false
+ispositive(x::AbstractFloat) = isnan(x) ? false : x > zero(x)
+ispositive(x) = x > zero(x)
+
+################################################################################
+################################################################################
 
 # STATISTICS
 

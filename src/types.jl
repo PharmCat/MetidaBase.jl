@@ -74,6 +74,16 @@ function Base.pushfirst!(t::MetidaTable, row::NamedTuple)
     t
 end
 
+function Base.size(t::MetidaTable, i::Int)
+    if i == 1
+        return length(t.table[1])
+    elseif i == 2
+        return length(t.table)
+    else
+        error("Wrong dimention!")
+    end
+end
+
 function Base.show(io::IO, table::MetidaTable)
     pretty_table(io, table; tf = PrettyTables.tf_compact)
 end

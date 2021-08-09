@@ -14,6 +14,9 @@ using Test
     mt[:, :b]
     Base.show(io, mt)
 
+    @test size(mt, 1) == 5
+    @test size(mt, 2) == 2
+
     struct ExampleIDStruct <: MetidaBase.AbstractSubject
         #time
         #obs
@@ -51,6 +54,7 @@ using Test
     @test exrsds[:, :r1][1] == 3
     @test exrsds[1, :r1] == 3
 
+
     @test MetidaBase.getid(exidds[3], :a) == 2
     sort!(exidds, :a)
     @test MetidaBase.getid(exidds[3], :a) == 3
@@ -58,12 +62,22 @@ using Test
 
     sort!(exrsds, :a)
 
+    @test first(exrsds) == exrsds[1]
+
     MetidaBase.uniqueidlist(exidds, [:a])
     MetidaBase.uniqueidlist(exidds, :a)
 
     MetidaBase.subset(exidds, Dict(:a => 1))
-    #println(exrsds[:, :r1])
 
-    #println(MetidaBase.getid(exrsds, :, :a1))
+    mt = MetidaBase.metida_table(exrsds)
 
+    v1 = [1,2,-6,missing,NaN]
+    itr1 = MetidaBase.skipnanormissing(v1)
+    for i in itr1
+        @test !MetidaBase.isnanormissing(i)
+    end
+    itr2 = MetidaBase.skipnonpositive(v1)
+    for i in itr2
+        @test MetidaBase.ispositive(i)
+    end
 end
