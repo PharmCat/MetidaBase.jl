@@ -21,7 +21,7 @@ end
 ################################################################################
 
 isnanormissing(x::Number) = isnan(x)
-isnanormissing(x::AbstractFloat) = isnan(x) 
+isnanormissing(x::AbstractFloat) = isnan(x)
 isnanormissing(x::Missing) = true
 
 ispositive(::Missing) = false
@@ -49,7 +49,7 @@ end
 LnVariance from CV.
 """
 function varfromcv(cv)
-     return log(1+cv^2)
+     return log(1 + cv^2)
 end
 """
     cvfromvar(σ²::Real)::AbstractFloat
@@ -57,7 +57,7 @@ end
 CV from variance.
 """
 function cvfromvar(σ²)
-    return sqrt(exp(σ²)-1)
+    return sqrt(exp(σ²) - 1)
 end
 #CV2se
 """
@@ -66,5 +66,5 @@ end
 CV from variance.
 """
 function cvfromsd(σ)
-    return sqrt(exp(σ^2)-1)
+    return sqrt(exp(σ^2) - 1)
 end

@@ -1,5 +1,5 @@
 using MetidaBase
-using Test
+using Test, DataFrames
 
 @testset "MetidaBase.jl" begin
     io       = IOBuffer();
@@ -16,6 +16,15 @@ using Test
 
     @test size(mt, 1) == 5
     @test size(mt, 2) == 2
+
+    df = DataFrame(mt)
+
+    rows = Tables.rows(mt)
+
+    for (i,j) in enumerate(mt)
+        @test mt[i, :a] == j[1]
+        @test mt[i, :b] == j[2]
+    end
 
     struct ExampleIDStruct <: MetidaBase.AbstractSubject
         #time
@@ -80,4 +89,9 @@ using Test
     for i in itr2
         @test MetidaBase.ispositive(i)
     end
+
+    MetidaBase.sdfromcv(0.4) ≈ 0.38525317015992666
+    MetidaBase.varfromcv(0.4) ≈ 0.1484200051182734
+    MetidaBase.cvfromvar(0.4) ≈ 0.7013021443295824
+    MetidaBase.cvfromsd(0.4) ≈ 0.41654636115540644
 end

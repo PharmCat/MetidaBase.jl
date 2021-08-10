@@ -25,6 +25,8 @@ function metida_table(args...; names = nothing)
     end
     MetidaBase.MetidaTable(NamedTuple{names}(args))
 end
+
+table(t::MetidaTable) = getfield(t, :table)
 ################################################################################
 # TABLES
 ################################################################################
@@ -34,17 +36,40 @@ Tables.columnaccess(t::MetidaTable) = true
 
 Tables.columns(t::MetidaTable) = t
 
-Tables.getcolumn(t::MetidaTable, i::Int) = t.table[i]
+Tables.getcolumn(t::MetidaTable, i::Int) = getfield(t, :table)[i]
 
-Tables.getcolumn(t::MetidaTable, nm::Symbol) = t.table[nm]
+Tables.getcolumn(t::MetidaTable, nm::Symbol) = getfield(t, :table)[nm]
 
 Tables.getcolumn(t::MetidaTable, ::Type{T}, col::Int, nm::Symbol) where {T} = t[:, col]
 
-Tables.columnnames(t::MetidaTable) = collect(keys(t.table))
+Tables.columnnames(t::MetidaTable) = names(t)
+
+Tables.rowaccess(::Type{<:MetidaTable}) = true
+# just return itself, which means MatrixTable must iterate `Tables.AbstractRow`-compatible objects
+Tables.rows(t::MetidaTable) = t
+
+# a custom row type; acts as a "view" into a row of an AbstractMatrix
+struct MetidaTableRow{T} <: Tables.AbstractRow
+    row::Int
+    source::MetidaTable{T}
+end
+
+Base.iterate(t::MetidaTable, st=1) = st > length(t) ? nothing : (MetidaTableRow(st, t), st + 1)
+
+Tables.getcolumn(t::MetidaTableRow, ::Type, col::Int, nm::Symbol) = getfield(t, :source)[getfield(t, :row), col]
+
+Tables.getcolumn(t::MetidaTableRow, i::Int) = getfield(t, :source)[getfield(t, :row), i]
+
+Tables.getcolumn(t::MetidaTableRow, nm::Symbol) = getfield(t, :source)[getfield(t, :row), nm]
+
+Tables.columnnames(t::MetidaTableRow) = names(getfield(t, :source))
 
 ################################################################################
 # BASE
 ################################################################################
+
+Base.names(t::MetidaTable) = collect(keys(t.table))
+
 function Base.getindex(t::MetidaTable, col::Colon, ind::T) where T <: Union{Symbol, Int}
     Tables.getcolumn(t, ind)
 end
@@ -74,9 +99,11 @@ function Base.pushfirst!(t::MetidaTable, row::NamedTuple)
     t
 end
 
+Base.length(t::MetidaTable) = length(first(t.table))
+
 function Base.size(t::MetidaTable, i::Int)
     if i == 1
-        return length(t.table[1])
+        return length(first(t.table))
     elseif i == 2
         return length(t.table)
     else
