@@ -94,4 +94,6 @@ using Test, DataFrames
     MetidaBase.varfromcv(0.4) ≈ 0.1484200051182734
     MetidaBase.cvfromvar(0.4) ≈ 0.7013021443295824
     MetidaBase.cvfromsd(0.4) ≈ 0.41654636115540644
+
+    smt = MetidaBase.Tables.schema(mt)
 end

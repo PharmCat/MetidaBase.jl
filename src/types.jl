@@ -64,6 +64,8 @@ Tables.getcolumn(t::MetidaTableRow, nm::Symbol) = getfield(t, :source)[getfield(
 
 Tables.columnnames(t::MetidaTableRow) = names(getfield(t, :source))
 
+Tables.schema(t::MetidaTable) = Tables.Schema(names(t), eltype(y) for y in t.table)
+
 ################################################################################
 # BASE
 ################################################################################

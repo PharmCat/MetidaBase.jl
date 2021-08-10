@@ -9,7 +9,7 @@ module MetidaBase
     #@reexport using StatsModels
 
     import StatsModels: StatisticalModel
-    import Tables: istable, columnaccess, columns, getcolumn, columnnames
+    import Tables: istable, columnaccess, columns, getcolumn, columnnames, schema, rowaccess, rows
 
     import Base: getindex, length, ht_keyindex, show, pushfirst!, iterate, size
 
