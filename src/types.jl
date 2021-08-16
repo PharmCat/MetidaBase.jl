@@ -175,6 +175,9 @@ function Base.iterate(d::DataSet, i::Int)
     return Base.iterate(d.ds, i)
 end
 
+function Base.map(f, d::DataSet)
+    DataSet(map(f, getdata(d)))
+end
 ################################################################################
 # BASE.SORT
 ################################################################################
@@ -256,10 +259,15 @@ function uniqueidlist(d::DataSet{T}, list::Symbol) where T <: AbstractIdData
     dl
 end
 
-function subset(d::DataSet, sort::Dict)
+function subset(d::DataSet{T}, sort::Dict) where T <: AbstractIdData
     inds = findall(x-> sort ⊆ x.id, d.ds)
     if length(inds) > 0 return DataSet(d.ds[inds]) end
-    []
+    DataSet(Vector{T}(undef, 0))
+end
+function subset(d::DataSet{T}, sort::Dict) where T <: AbstractIDResult
+    inds = findall(x-> sort ⊆ x.data.id, d.ds)
+    if length(inds) > 0 return DataSet(d.ds[inds]) end
+    DataSet(Vector{T}(undef, 0))
 end
 ################################################################################
 # metida_table from DataSet{AbstractIDResult}

@@ -5,7 +5,7 @@ end
 skipnonpositive(itr) = SkipNonPositive(itr)
 
 Base.IteratorEltype(::Type{SkipNonPositive{T}}) where {T} = Base.IteratorEltype(T)
-#Base.eltype(::Type{SkipNonPositive{T}}) where {T} = nonmissingtype(eltype(T))
+Base.eltype(::Type{SkipNonPositive{T}}) where {T} = nonmissingtype(eltype(T))
 function Base.iterate(itr::SkipNonPositive, state...)
     y = iterate(itr.x, state...)
     y === nothing && return nothing
@@ -39,7 +39,7 @@ end
 skipnanormissing(itr) = SkipNaNorMissing(itr)
 
 Base.IteratorEltype(::Type{SkipNaNorMissing{T}}) where {T} = Base.IteratorEltype(T)
-#Base.eltype(::Type{SkipNaNorMissing{T}}) where {T} = nonmissingtype(eltype(T))
+Base.eltype(::Type{SkipNaNorMissing{T}}) where {T} = nonmissingtype(eltype(T))
 function Base.iterate(itr::SkipNaNorMissing, state...)
     y = iterate(itr.x, state...)
     y === nothing && return nothing

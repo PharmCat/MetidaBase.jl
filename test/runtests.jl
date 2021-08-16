@@ -1,5 +1,5 @@
 using MetidaBase
-using Test, DataFrames
+using Test, DataFrames, CSV
 
 @testset "MetidaBase.jl" begin
     io       = IOBuffer();
@@ -25,6 +25,8 @@ using Test, DataFrames
         @test mt[i, :a] == j[1]
         @test mt[i, :b] == j[2]
     end
+
+    CSV.write(io, mt)
 
     struct ExampleIDStruct <: MetidaBase.AbstractSubject
         #time
@@ -60,6 +62,7 @@ using Test, DataFrames
 
     exrsds = MetidaBase.DataSet(exrsdsv)
 
+
     @test exrsds[:, :r1][1] == 3
     @test exrsds[1, :r1] == 3
 
@@ -77,6 +80,9 @@ using Test, DataFrames
     MetidaBase.uniqueidlist(exidds, :a)
 
     MetidaBase.subset(exidds, Dict(:a => 1))
+    MetidaBase.subset(exrsds, Dict(:a => 1))
+
+    map(identity, exidds)
 
     mt = MetidaBase.metida_table(exrsds)
 
@@ -85,10 +91,19 @@ using Test, DataFrames
     for i in itr1
         @test !MetidaBase.isnanormissing(i)
     end
+    eachindex(itr1)
+    eltype(itr1)
+    keys(itr1)
+    @test length(itr1) == 3
+
     itr2 = MetidaBase.skipnonpositive(v1)
     for i in itr2
         @test MetidaBase.ispositive(i)
     end
+    eachindex(itr2)
+    eltype(itr2)
+    keys(itr2)
+    @test length(itr2) == 2
 
     MetidaBase.sdfromcv(0.4) ≈ 0.38525317015992666
     MetidaBase.varfromcv(0.4) ≈ 0.1484200051182734
@@ -96,4 +111,5 @@ using Test, DataFrames
     MetidaBase.cvfromsd(0.4) ≈ 0.41654636115540644
 
     smt = MetidaBase.Tables.schema(mt)
+
 end
