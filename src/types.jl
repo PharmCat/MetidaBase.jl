@@ -83,6 +83,14 @@ function Base.setindex!(t::MetidaTable, val, row::Int, ind::T) where T <: Union{
     Tables.getcolumn(t, ind)[row] = val
 end
 
+function Base.append!(t::MetidaTable, t2::MetidaTable)
+    if !(names(t) ⊆ names(t2)) error("Names for t not in t2") end
+    for n in names(t)
+        append!(t[:, n], t2[:, n])
+    end
+    t
+end
+
 function Base.pushfirst!(t::MetidaTable, row::AbstractVector)
     if length(row) != length(keys(t.table)) error("Size not equal") end
     i = 1

@@ -1,7 +1,7 @@
 name = "MetidaBase"
 uuid = "075456b7-4006-432f-9324-2f8453996c49"
 authors = ["PharmCat <v.s.arnautov@yandex.ru> and contributors"]
-version = "0.4.0"
+version = "0.4.1"
 
 [deps]
 #StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"

@@ -26,6 +26,13 @@ using Test, DataFrames, CSV
         @test mt[i, :b] == j[2]
     end
 
+    l1 = length(mt)
+    mt2 = MetidaBase.metida_table([1,2,3], ["a", "b", "c"], names = (:a, :b))
+    append!(mt, mt2)
+    @test l1 + length(mt2) == length(mt)
+    mt2 = MetidaBase.metida_table(["e", "f", "g"], [1,2,3], names = (:b, :a))
+    append!(mt, mt2)
+
     CSV.write(io, mt)
 
     struct ExampleIDStruct <: MetidaBase.AbstractSubject
