@@ -92,6 +92,7 @@ using Test, DataFrames, CSV
     map(identity, exidds)
 
     mt = MetidaBase.metida_table(exrsds)
+    mt = MetidaBase.metida_table(exrsds; results = :r1, ids = :a)
 
     v1 = [1,2,-6,missing,NaN]
     itr1 = MetidaBase.skipnanormissing(v1)
