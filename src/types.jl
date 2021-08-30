@@ -4,10 +4,7 @@
 struct MetidaTable{T <: NamedTuple}
     table::T
 end
-function metida_table(table::NamedTuple)
-    MetidaTable(table)
-end
-function metida_table(args...; names = nothing)
+function metida_table_(args...; names = nothing)
     if length(args) > 1
         e1 = length(args[1])
         i = 2
@@ -23,7 +20,13 @@ function metida_table(args...; names = nothing)
             names = Tuple(names)
         end
     end
-    MetidaBase.MetidaTable(NamedTuple{names}(args))
+    NamedTuple{names}(args)
+end
+function metida_table(table::NamedTuple)
+    MetidaTable(table)
+end
+function metida_table(args...; names = nothing)
+    metida_table(metida_table_(args...; names = names))
 end
 
 table(t::MetidaTable) = getfield(t, :table)
@@ -155,10 +158,6 @@ end
     rd.result[ind]
 end
 
-#@inline function getresultindex(subj, ind::Symbol)
-#    getindormiss(subj.result, ind)
-#end
-
 function Base.getindex(d::DataSet{T}, col::Int, ind) where T <: AbstractResultData
     getresultindex_safe(d[col], ind)
 end
@@ -167,7 +166,6 @@ function Base.getindex(d::DataSet{T}, col::Colon, ind) where T <: AbstractResult
         if Base.ht_keyindex(d.ds[i].result, ind) < 1 return getresultindex_safe.(d.ds, ind) end
     end
     getresultindex_unsafe.(d.ds, ind)
-    #getresultindex.(ds.data, ind)
 end
 
 Base.first(d::DataSet) = first(d.ds)
@@ -179,6 +177,7 @@ end
 function Base.iterate(d::DataSet)
     return Base.iterate(d.ds)
 end
+
 function Base.iterate(d::DataSet, i::Int)
     return Base.iterate(d.ds, i)
 end
@@ -256,6 +255,7 @@ function uniqueidlist(d::DataSet{T}, list::AbstractVector{Symbol}) where T <: Ab
     end
     dl
 end
+
 function uniqueidlist(d::DataSet{T}, list::Symbol) where T <: AbstractIdData
     dl = Vector{Dict}(undef, 0)
     for i in d
@@ -277,10 +277,13 @@ function subset(d::DataSet{T}, sort::Dict) where T <: AbstractIDResult
     if length(inds) > 0 return DataSet(d.ds[inds]) end
     DataSet(Vector{T}(undef, 0))
 end
+function subset(d::DataSet{T}, inds) where T 
+    DataSet(getdata(d)[inds])
+end
 ################################################################################
 # metida_table from DataSet{AbstractIDResult}
 ################################################################################
-function metida_table(obj::DataSet{RD}; order = nothing, results = nothing, ids = nothing) where RD <: AbstractIDResult
+function metida_table_(obj::DataSet{RD}; order = nothing, results = nothing, ids = nothing) where RD <: AbstractIDResult
     idset  = Set(keys(first(obj).data.id))
     resset = Set(keys(first(obj).result))
     if length(obj) > 1
@@ -302,13 +305,22 @@ function metida_table(obj::DataSet{RD}; order = nothing, results = nothing, ids 
         ids ⊆ idset || error("Some id not in dataset!")
         idset = intersect(idset, ids)
     end
-    mt1 = MetidaBase.metida_table((getid(obj, :, c) for c in idset)...; names = idset)
-    mt2 = MetidaBase.metida_table((obj[:, c] for c in ressetl)...; names = ressetl)
-    MetidaTable(merge(mt1.table, mt2.table))
+    mt1 = metida_table_((getid(obj, :, c) for c in idset)...; names = idset)
+    mt2 = metida_table_((obj[:, c] for c in ressetl)...; names = ressetl)
+    merge(mt1, mt2)
+end
+function metida_table(obj::DataSet{RD}; order = nothing, results = nothing, ids = nothing) where RD <: AbstractIDResult
+    metida_table(metida_table_(obj; order = order, results = results, ids = ids))
 end
 ################################################################################
-# MetidaFreq.jl
+# TypedTables.jl interface
 
+function TypedTables.Table(obj::DataSet{RD}; order = nothing, results = nothing, ids = nothing) where RD <: AbstractIDResult
+    TypedTables.Table(metida_table_(obj; order = order, results = results, ids = ids))
+end
+
+
+# MetidaFreq.jl
 struct Proportion <: AbstractData
     x::Int
     n::Int

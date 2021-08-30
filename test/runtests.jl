@@ -1,5 +1,5 @@
 using MetidaBase
-using Test, DataFrames, CSV
+using Test, Tables, TypedTables, CSV
 
 @testset "MetidaBase.jl" begin
     io       = IOBuffer();
@@ -17,7 +17,7 @@ using Test, DataFrames, CSV
     @test size(mt, 1) == 5
     @test size(mt, 2) == 2
 
-    df = DataFrame(mt)
+    df = Table(mt)
 
     rows = Tables.rows(mt)
 
@@ -88,11 +88,14 @@ using Test, DataFrames, CSV
 
     MetidaBase.subset(exidds, Dict(:a => 1))
     MetidaBase.subset(exrsds, Dict(:a => 1))
+    MetidaBase.subset(exrsds, 1:2)
 
     map(identity, exidds)
 
     mt = MetidaBase.metida_table(exrsds)
     mt = MetidaBase.metida_table(exrsds; results = :r1, ids = :a)
+    Table(exrsds; results = :r1, ids = [:a, :b])
+    #Table(exrsds)
 
     v1 = [1,2,-6,missing,NaN]
     itr1 = MetidaBase.skipnanormissing(v1)
