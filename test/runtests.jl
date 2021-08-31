@@ -95,7 +95,6 @@ using Test, Tables, TypedTables, CSV
     mt = MetidaBase.metida_table(exrsds)
     mt = MetidaBase.metida_table(exrsds; results = :r1, ids = :a)
     Table(exrsds; results = :r1, ids = [:a, :b])
-    #Table(exrsds)
 
     v1 = [1,2,-6,missing,NaN]
     itr1 = MetidaBase.skipnanormissing(v1)

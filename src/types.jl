@@ -277,7 +277,7 @@ function subset(d::DataSet{T}, sort::Dict) where T <: AbstractIDResult
     if length(inds) > 0 return DataSet(d.ds[inds]) end
     DataSet(Vector{T}(undef, 0))
 end
-function subset(d::DataSet{T}, inds) where T 
+function subset(d::DataSet{T}, inds) where T
     DataSet(getdata(d)[inds])
 end
 ################################################################################
@@ -309,14 +309,17 @@ function metida_table_(obj::DataSet{RD}; order = nothing, results = nothing, ids
     mt2 = metida_table_((obj[:, c] for c in ressetl)...; names = ressetl)
     merge(mt1, mt2)
 end
-function metida_table(obj::DataSet{RD}; order = nothing, results = nothing, ids = nothing) where RD <: AbstractIDResult
-    metida_table(metida_table_(obj; order = order, results = results, ids = ids))
+function metida_table(obj::DataSet{RD}; kwargs...) where RD <: AbstractIDResult
+    metida_table(metida_table_(obj; kwargs...))
 end
 ################################################################################
 # TypedTables.jl interface
 
-function TypedTables.Table(obj::DataSet{RD}; order = nothing, results = nothing, ids = nothing) where RD <: AbstractIDResult
-    TypedTables.Table(metida_table_(obj; order = order, results = results, ids = ids))
+function TypedTables.Table(obj::AbstractDataSet; kwargs...)
+    TypedTables.Table(metida_table_(obj; kwargs...))
+end
+function TypedTables.Table(obj::MetidaTable)
+    TypedTables.Table(obj.table)
 end
 
 
