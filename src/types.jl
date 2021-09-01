@@ -4,6 +4,12 @@
 struct MetidaTable{T <: NamedTuple}
     table::T
 end
+function metida_table(table::NamedTuple)
+    MetidaTable(table)
+end
+function metida_table(args...; kwargs...)
+    MetidaTable(metida_table_(args...; kwargs...))
+end
 function metida_table_(args...; names = nothing)
     if length(args) > 1
         e1 = length(args[1])
@@ -13,7 +19,7 @@ function metida_table_(args...; names = nothing)
         end
     end
     if isnothing(names)
-        names = Tuple(Symbol.("x" .* string.(collect(1:length(args)))))
+        names = Tuple(Symbol.(:x , Symbol.(collect(1:length(args)))))
     else
         if length(args) != length(names) error("Length args and names not equal") end
         if !(typeof(names) <: Tuple)
@@ -21,12 +27,6 @@ function metida_table_(args...; names = nothing)
         end
     end
     NamedTuple{names}(args)
-end
-function metida_table(table::NamedTuple)
-    MetidaTable(table)
-end
-function metida_table(args...; names = nothing)
-    metida_table(metida_table_(args...; names = names))
 end
 
 table(t::MetidaTable) = getfield(t, :table)
@@ -308,9 +308,6 @@ function metida_table_(obj::DataSet{RD}; order = nothing, results = nothing, ids
     mt1 = metida_table_((getid(obj, :, c) for c in idset)...; names = idset)
     mt2 = metida_table_((obj[:, c] for c in ressetl)...; names = ressetl)
     merge(mt1, mt2)
-end
-function metida_table(obj::DataSet{RD}; kwargs...) where RD <: AbstractIDResult
-    metida_table(metida_table_(obj; kwargs...))
 end
 ################################################################################
 # TypedTables.jl interface
