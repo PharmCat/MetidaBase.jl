@@ -95,6 +95,8 @@ using Test, Tables, TypedTables, CSV
 
     @test_nowarn sort!(exrsds, :a)
 
+
+
     @test first(exrsds) == exrsds[1]
 
     MetidaBase.uniqueidlist(exidds, [:a])
@@ -105,6 +107,12 @@ using Test, Tables, TypedTables, CSV
     MetidaBase.subset(exrsds, 1:2)
 
     @test_nowarn map(identity, exidds)
+
+    filtexrsds = filter(x -> x.id[:a] == 2, exidds)
+    filter!(x -> x.id[:a] == 2, exidds)
+
+    @test length(filtexrsds) == length(exidds)
+    @test filtexrsds[1].id[:a] == exidds[1].id[:a] == 2
 
     mt  = MetidaBase.metida_table(exrsds)
     mt  = MetidaBase.metida_table(exrsds; results = :r1, ids = :a)

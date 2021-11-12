@@ -1,4 +1,4 @@
-
+# Заполняет словарь d индексами индивидуальных значений
 function indsdict!(d::Dict{T}, cdata::Tuple) where T
     @inbounds for (i, element) in enumerate(zip(cdata...))
         ind = ht_keyindex(d, element)

@@ -168,18 +168,18 @@ function Base.getindex(d::DataSet{T}, col::Colon, ind) where T <: AbstractResult
     getresultindex_unsafe.(d.ds, ind)
 end
 
-Base.first(d::DataSet) = first(d.ds)
+Base.first(d::DataSet) = first(getdata(d))
 
 function Base.length(d::DataSet)
-    length(d.ds)
+    length(getdata(d))
 end
 
 function Base.iterate(d::DataSet)
-    return Base.iterate(d.ds)
+    return Base.iterate(getdata(d))
 end
 
 function Base.iterate(d::DataSet, i::Int)
-    return Base.iterate(d.ds, i)
+    return Base.iterate(getdata(d), i)
 end
 
 function Base.map(f, d::DataSet)
@@ -208,6 +208,18 @@ function Base.sort!(d::DataSet{T}, k; alg::Base.Algorithm = QuickSort, lt=nothin
     d
 end
 
+################################################################################
+# filter
+################################################################################
+function Base.filter(f::Function, d::DataSet)
+    ds   =  getdata(d)
+    inds  = findall(f, ds)
+    DataSet(ds[inds])
+end
+function Base.filter!(f::Function, d::DataSet)
+    filter!(f, getdata(d))
+    d
+end
 ################################################################################
 # SELF
 ################################################################################
@@ -248,8 +260,8 @@ end
 function uniqueidlist(d::DataSet{T}, list::AbstractVector{Symbol}) where T <: AbstractIdData
     dl = Vector{Dict}(undef, 0)
     for i in d
-        if list ⊆ keys(i.id)
-            subd = Dict(k => i.id[k] for k in list)
+        if list ⊆ keys(getid(i))
+            subd = Dict(k => getid(i)[k] for k in list)
             if subd ∉ dl push!(dl, subd) end
         end
     end
@@ -259,8 +271,8 @@ end
 function uniqueidlist(d::DataSet{T}, list::Symbol) where T <: AbstractIdData
     dl = Vector{Dict}(undef, 0)
     for i in d
-        if list in keys(i.id)
-            subd = Dict(list => i.id[list])
+        if list in keys(getid(i))
+            subd = Dict(list => getid(i)[list])
             if subd ∉ dl push!(dl, subd) end
         end
     end
@@ -268,13 +280,13 @@ function uniqueidlist(d::DataSet{T}, list::Symbol) where T <: AbstractIdData
 end
 
 function subset(d::DataSet{T}, sort::Dict) where T <: AbstractIdData
-    inds = findall(x-> sort ⊆ x.id, d.ds)
-    if length(inds) > 0 return DataSet(d.ds[inds]) end
+    inds = findall(x-> sort ⊆ getid(x), getdata(d))
+    if length(inds) > 0 return DataSet(getdata(d)[inds]) end
     DataSet(Vector{T}(undef, 0))
 end
 function subset(d::DataSet{T}, sort::Dict) where T <: AbstractIDResult
-    inds = findall(x-> sort ⊆ x.data.id, d.ds)
-    if length(inds) > 0 return DataSet(d.ds[inds]) end
+    inds = findall(x-> sort ⊆ getid(x), getdata(d))
+    if length(inds) > 0 return DataSet(getdata(d)[inds]) end
     DataSet(Vector{T}(undef, 0))
 end
 function subset(d::DataSet{T}, inds) where T
