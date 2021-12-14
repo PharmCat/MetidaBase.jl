@@ -23,7 +23,11 @@ function metida_table_(args...; names = nothing)
     else
         if length(args) != length(names) error("Length args and names not equal") end
         if !(typeof(names) <: Tuple)
-            names = Tuple(names)
+            if !(typeof(names) <: AbstractVector{Symbol})
+                names = Tuple(Symbol.(names))
+            else
+                names = Tuple(names)
+            end
         end
     end
     NamedTuple{names}(args)
