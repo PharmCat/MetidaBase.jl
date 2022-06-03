@@ -140,6 +140,10 @@ using Test, Tables, TypedTables, CSV
     keys(itr2)
     @test length(itr2) == 2
 
+    @test MetidaBase.nonunique([1,2,3,3,4,5,6,6]) == [6,3]
+
+    @test MetidaBase.sortbyvec!([1,2,3,4,5,6,7,8], [2,5,3,1,8,4,6,7]) == [2,5,3,1,8,4,6,7]
+
     #Ststutils
     MetidaBase.sdfromcv(0.4) ≈ 0.38525317015992666
     MetidaBase.varfromcv(0.4) ≈ 0.1484200051182734

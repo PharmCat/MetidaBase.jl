@@ -13,18 +13,34 @@ function indsdict!(d::Dict{T}, cdata::Tuple) where T
     d
 end
 
+"""
+Sort `a` by values of `vec`.
+"""
 function sortbyvec!(a, vec)
     sort!(a, by = x -> findfirst(y -> x == y, vec))
 end
 
+"""
+Find all non-unique values.
+"""
+nonunique(v) = [k for (k, v) in StatsBase.countmap(v) if v > 1]
+
+
 ################################################################################
 ################################################################################
 
+"""
+Return `true` if value NaN or Missing.
+"""
 isnanormissing(x::Number) = isnan(x)
 isnanormissing(x::AbstractFloat) = isnan(x)
 isnanormissing(x::Missing) = true
 
+"""
+Return `true` if value > 0, other cases - `false` (Missing, Nothing, NaN)
+"""
 ispositive(::Missing) = false
+ispositive(::Nothing) = false
 ispositive(x::AbstractFloat) = isnan(x) ? false : x > zero(x)
 ispositive(x) = x > zero(x)
 
