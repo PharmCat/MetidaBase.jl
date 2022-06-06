@@ -1,5 +1,5 @@
 # Заполняет словарь d индексами индивидуальных значений
-function indsdict!(d::Dict{T}, cdata::Tuple) where T
+function indsdict!(d::Dict{T, Vector{Int}}, cdata) where T
     @inbounds for (i, element) in enumerate(zip(cdata...))
         ind = ht_keyindex(d, element)
         if ind > 0
@@ -12,19 +12,38 @@ function indsdict!(d::Dict{T}, cdata::Tuple) where T
     end
     d
 end
+function indsdict!(d::Dict, mt::MetidaTable)
+    indsdict!(d, table(mt))
+end
 
+"""
+Sort `a` by values of `vec`.
+"""
 function sortbyvec!(a, vec)
     sort!(a, by = x -> findfirst(y -> x == y, vec))
 end
 
+"""
+Find all non-unique values.
+"""
+nonunique(v) = [k for (k, v) in StatsBase.countmap(v) if v > 1]
+
+
 ################################################################################
 ################################################################################
 
+"""
+Return `true` if value NaN or Missing.
+"""
 isnanormissing(x::Number) = isnan(x)
 isnanormissing(x::AbstractFloat) = isnan(x)
 isnanormissing(x::Missing) = true
 
+"""
+Return `true` if value > 0, other cases - `false` (Missing, Nothing, NaN)
+"""
 ispositive(::Missing) = false
+ispositive(::Nothing) = false
 ispositive(x::AbstractFloat) = isnan(x) ? false : x > zero(x)
 ispositive(x) = x > zero(x)
 

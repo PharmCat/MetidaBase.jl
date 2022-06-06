@@ -4,9 +4,29 @@
 struct MetidaTable{T <: NamedTuple}
     table::T
 end
+"""
+    metida_table(table::NamedTuple)
+
+Make MetidaTable from NamedTuple.
+"""
 function metida_table(table::NamedTuple)
     MetidaTable(table)
 end
+
+"""
+    metida_table(args...; kwargs...)
+
+Make MetidaTable.
+
+For AbstractIDResult:
+
+    metida_table(obj::DataSet{RD}; order = nothing, results = nothing, ids = nothing)
+
+Where obj <: DataSet{<:AbstractIDResult}
+order - order of columns (Vector of column's names);
+results - result columns;
+ids - ID's columns;
+"""
 function metida_table(args...; kwargs...)
     MetidaTable(metida_table_(args...; kwargs...))
 end
