@@ -53,12 +53,12 @@ function Base.iterate(itr::SkipNaNorMissing, state...)
 end
 Base.IndexStyle(::Type{<:SkipNaNorMissing{T}}) where {T} = IndexStyle(T)
 Base.eachindex(itr::SkipNaNorMissing) =
-    Iterators.filter(i -> isnanormissing(@inbounds(itr.x[i])), eachindex(itr.x))
+    Iterators.filter(i -> !isnanormissing(@inbounds(itr.x[i])), eachindex(itr.x))
 Base.keys(itr::SkipNaNorMissing) =
-    Iterators.filter(i -> isnanormissing(@inbounds(itr.x[i])), keys(itr.x))
+    Iterators.filter(i -> !isnanormissing(@inbounds(itr.x[i])), keys(itr.x))
 Base.@propagate_inbounds function getindex(itr::SkipNaNorMissing, I...)
     v = itr.x[I...]
-    !isnanormissing(v) && throw(ErrorException("The value at index $I is NaN or missing!"))
+    isnanormissing(v) && throw(ErrorException("The value at index $I is NaN or missing!"))
     v
 end
 function Base.length(itr::SkipNaNorMissing)

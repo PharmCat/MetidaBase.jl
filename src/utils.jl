@@ -1,4 +1,5 @@
 # Заполняет словарь d индексами индивидуальных значений
+#=
 function indsdict!(d::Dict{T, Vector{Int}}, cdata) where T
     @inbounds for (i, element) in enumerate(zip(cdata...))
         ind = ht_keyindex(d, element)
@@ -12,6 +13,34 @@ function indsdict!(d::Dict{T, Vector{Int}}, cdata) where T
     end
     d
 end
+=#
+function indsdict!(d::Dict, cdata)
+    @inbounds for (i, element) in enumerate(zip(cdata...))
+        ind = ht_keyindex(d, element)
+        if ind > 0
+            push!(d.vals[ind], i)
+        else
+            v = Vector{Int}(undef, 1)
+            v[1] = i
+            d[element] = v
+        end
+    end
+    d
+end
+function indsdict!(d::Dict, cdata::AbstractVector) 
+    @inbounds for i = 1:length(cdata)
+        ind = ht_keyindex(d, cdata[i])
+        if ind > 0
+            push!(d.vals[ind], i)
+        else
+            v = Vector{Int}(undef, 1)
+            v[1] = i
+            d[cdata[i]] = v
+        end
+    end
+    d
+end
+
 function indsdict!(d::Dict, mt::MetidaTable)
     indsdict!(d, table(mt))
 end

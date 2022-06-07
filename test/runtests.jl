@@ -126,18 +126,18 @@ using Test, Tables, TypedTables, CSV
     for i in itr1
         @test !MetidaBase.isnanormissing(i)
     end
-    eachindex(itr1)
+    @test collect(eachindex(itr1)) == [1,2,3]
     eltype(itr1)
-    keys(itr1)
+    @test collect(keys(itr1))  == [1,2,3]
     @test length(itr1) == 3
 
     itr2 = MetidaBase.skipnonpositive(v1)
     for i in itr2
         @test MetidaBase.ispositive(i)
     end
-    eachindex(itr2)
+    @test collect(eachindex(itr2)) == [1,2]
     eltype(itr2)
-    keys(itr2)
+    @test collect(keys(itr2))  == [1,2]
     @test length(itr2) == 2
 
     @test MetidaBase.nonunique([1,2,3,3,4,5,6,6]) == [6,3]
