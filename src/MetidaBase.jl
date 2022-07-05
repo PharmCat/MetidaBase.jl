@@ -4,7 +4,7 @@
 __precompile__(true)
 module MetidaBase
 
-    using Tables, PrettyTables, TypedTables, StatsBase#, Reexport
+    using Tables, PrettyTables, TypedTables, StatsBase, StatsModels#, Reexport
 
     #@reexport using StatsModels
 
@@ -12,7 +12,7 @@ module MetidaBase
     import Tables: istable, columnaccess, columns, getcolumn, columnnames, schema, rowaccess, rows
     import CPUSummary: num_cores
 
-    import Base: getindex, length, ht_keyindex, show, pushfirst!, iterate, size
+    import Base: getindex, length, ht_keyindex, show, pushfirst!, iterate, size, findfirst
 
     include("abstracttype.jl")
     include("types.jl")

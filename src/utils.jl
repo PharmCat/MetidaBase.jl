@@ -27,7 +27,8 @@ function indsdict!(d::Dict, cdata)
     end
     d
 end
-function indsdict!(d::Dict, cdata::AbstractVector) 
+
+function indsdict!(d::Dict, cdata::AbstractVector)
     @inbounds for i = 1:length(cdata)
         ind = ht_keyindex(d, cdata[i])
         if ind > 0

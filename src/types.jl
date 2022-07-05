@@ -163,11 +163,16 @@ end
 function getdata(d::DataSet)
     d.ds
 end
+
 @inline function getindormiss(d::Dict{K}, i::K) where K
     ind::Int = ht_keyindex(d, i)
     if ind > 0 return d.vals[ind]  end
     missing
 end
+
+Tables.istable(::AbstractDataSet) = false
+
+Tables.rowaccess(::AbstractDataSet) = false
 ################################################################################
 # BASE
 ################################################################################
@@ -209,8 +214,11 @@ end
 function Base.map(f, d::DataSet)
     DataSet(map(f, getdata(d)))
 end
+
 ################################################################################
-# BASE.SORT
+# BASE
+################################################################################
+# sort!
 ################################################################################
 function islessdict(a::Dict{A1,A2}, b::Dict{B1,B2}, k::Union{AbstractVector, Set}) where A1 where A2 where B1 where B2
     l = length(k)
@@ -234,6 +242,7 @@ end
 
 ################################################################################
 # filter
+# filter!
 ################################################################################
 function Base.filter(f::Function, d::DataSet)
     ds   =  getdata(d)
@@ -244,6 +253,15 @@ function Base.filter!(f::Function, d::DataSet)
     filter!(f, getdata(d))
     d
 end
+
+################################################################################
+# Base.findfirst
+################################################################################
+
+function Base.findfirst(d::DataSet{<: AbstractIdData}, sort::Dict)
+    findfirst(x-> sort ⊆ getid(x), getdata(d))
+end
+
 ################################################################################
 # SELF
 ################################################################################
@@ -303,6 +321,7 @@ function uniqueidlist(d::DataSet{T}, list::Symbol) where T <: AbstractIdData
     dl
 end
 
+
 function subset(d::DataSet{T}, sort::Dict) where T <: AbstractIdData
     inds = findall(x-> sort ⊆ getid(x), getdata(d))
     if length(inds) > 0 return DataSet(getdata(d)[inds]) end
@@ -313,7 +332,7 @@ function subset(d::DataSet{T}, sort::Dict) where T <: AbstractIDResult
     if length(inds) > 0 return DataSet(getdata(d)[inds]) end
     DataSet(Vector{T}(undef, 0))
 end
-function subset(d::DataSet{T}, inds) where T
+function subset(d::DataSet, inds)
     DataSet(getdata(d)[inds])
 end
 ################################################################################
