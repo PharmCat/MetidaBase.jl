@@ -4,10 +4,10 @@
 __precompile__(true)
 module MetidaBase
 
-    using Tables, PrettyTables, TypedTables, StatsBase, StatsModels#, Reexport
+    using Tables, PrettyTables, StatsBase, StatsModels#, Reexport
 
     #@reexport using StatsModels
-
+    import DataFrames, TypedTables
     import StatsModels: StatisticalModel
     import Tables: istable, columnaccess, columns, getcolumn, columnnames, schema, rowaccess, rows
     import CPUSummary: num_cores

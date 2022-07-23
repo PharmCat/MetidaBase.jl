@@ -1,10 +1,19 @@
 using MetidaBase
-using Test, Tables, TypedTables, CSV
+using Test, Tables, TypedTables, DataFrames, CSV
 
 @testset "MetidaBase.jl" begin
     io       = IOBuffer();
     # Metida table names - auto
     mt = MetidaBase.metida_table([1,2,3], ["a", "b", "c"])
+
+    @test  Tables.istable(mt) == true
+    @test  Tables.rowaccess(mt) == true
+
+    # Get columns
+    mt = mt[:, [:x1, :x2]]
+    # Get row
+    mtr = mt[1, :]
+
     @test names(mt) == [:x1, :x2]
     # Metida table names - defined
     mt = MetidaBase.metida_table([1,2,3], ["a", "b", "c"], names = (:a, :b))
@@ -32,6 +41,7 @@ using Test, Tables, TypedTables, CSV
 
     # MetidaTable > TypedTables
     df = Table(mt)
+    df = DataFrame(mt)
 
     # Enumerate
     for (i,j) in enumerate(mt)
@@ -50,6 +60,13 @@ using Test, Tables, TypedTables, CSV
     # CSV compat test
     @test_nowarn CSV.write(io, mt)
 
+    mtd = MetidaBase.indsdict!(Dict(), mt)
+    @test mtd[(3, "c")] == [5, 8]
+
+    mtd = MetidaBase.indsdict!(Dict(), mt[:, 1])
+    @test mtd[2] == [4, 7, 10]
+
+    ############################################################################
     # Structures
     ############################################################################
     struct ExampleIDStruct <: MetidaBase.AbstractSubject
@@ -84,18 +101,17 @@ using Test, Tables, TypedTables, CSV
     end
     exrsds = MetidaBase.DataSet(exrsdsv)
 
+    # Index
     @test exrsds[:, :r1][1] == 3
     @test exrsds[1, :r1] == 3
 
-
     @test MetidaBase.getid(exidds[3], :a) == 2
+    # SORT
     sort!(exidds, :a)
     @test MetidaBase.getid(exidds[3], :a) == 3
     MetidaBase.getid(exrsds, :, :a)
 
     @test_nowarn sort!(exrsds, :a)
-
-
 
     @test first(exrsds) == exrsds[1]
 
@@ -114,37 +130,52 @@ using Test, Tables, TypedTables, CSV
     @test length(filtexrsds) == length(exidds)
     @test filtexrsds[1].id[:a] == exidds[1].id[:a] == 2
 
+    ############################################################################
+    # Table
     mt  = MetidaBase.metida_table(exrsds)
     mt  = MetidaBase.metida_table(exrsds; results = :r1, ids = :a)
     smt = MetidaBase.Tables.schema(mt)
+
+    ############################################################################
+
     # TypedTables export
     @test_nowarn Table(exrsds; results = :r1, ids = [:a, :b])
+
+    # DataFrames export
+    @test_nowarn DataFrame(exrsds; results = :r1, ids = [:a, :b])
+
+    ############################################################################
     #Iterators data
-    v1 = [1,2,-6,missing,NaN]
+    v1 = [1, 2, -6, missing, NaN, 0]
+
     #Iterators tests
     itr1 = MetidaBase.skipnanormissing(v1)
     for i in itr1
         @test !MetidaBase.isnanormissing(i)
     end
-    @test collect(eachindex(itr1)) == [1,2,3]
-    eltype(itr1)
-    @test collect(keys(itr1))  == [1,2,3]
-    @test length(itr1) == 3
+    @test collect(itr1) == [1.0, 2.0, -6.0, 0.0]
+    @test collect(eachindex(itr1)) == [1, 2, 3, 6]
+    @test eltype(itr1) <: Float64
+    @test collect(keys(itr1))  == [1, 2, 3, 6]
+    @test length(itr1) == 4
 
     itr2 = MetidaBase.skipnonpositive(v1)
     for i in itr2
         @test MetidaBase.ispositive(i)
     end
-    @test collect(eachindex(itr2)) == [1,2]
+    @test collect(eachindex(itr2)) == [1, 2]
     eltype(itr2)
-    @test collect(keys(itr2))  == [1,2]
+    @test collect(keys(itr2))  == [1, 2]
     @test length(itr2) == 2
 
+    ############################################################################
+    # OTHER
     @test MetidaBase.nonunique([1,2,3,3,4,5,6,6]) == [6,3]
 
     @test MetidaBase.sortbyvec!([1,2,3,4,5,6,7,8], [2,5,3,1,8,4,6,7]) == [2,5,3,1,8,4,6,7]
 
-    #Ststutils
+    ############################################################################
+    # Ststutils
     MetidaBase.sdfromcv(0.4) ≈ 0.38525317015992666
     MetidaBase.varfromcv(0.4) ≈ 0.1484200051182734
     MetidaBase.cvfromvar(0.4) ≈ 0.7013021443295824

@@ -4,6 +4,8 @@
 struct MetidaTable{T <: NamedTuple}
     table::T
 end
+
+
 """
     metida_table(table::NamedTuple)
 
@@ -102,6 +104,22 @@ Base.names(t::MetidaTable) = collect(keys(t.table))
 function Base.getindex(t::MetidaTable, col::Colon, ind::T) where T <: Union{Symbol, Int}
     Tables.getcolumn(t, ind)
 end
+function Base.getindex(t::MetidaTable, col::Colon, inds::AbstractVector{T}) where T <: Union{Symbol, Int}
+    if T <: Int
+        names = columnnames(t)[inds]
+    else
+        names = inds
+    end
+    cols = map(c->Tables.getcolumn(t, c), inds)
+    MetidaTable(metida_table_(cols...; names = names))
+end
+
+function Base.getindex(t::MetidaTable, r::Int, ::Colon)
+    MetidaTableRow(r, t)
+    #NamedTuple{keys(t.table)}(tuple(Iterators.map(c -> getindex(t, r, c), keys(t.table))...))
+end
+
+
 function Base.getindex(t::MetidaTable, row::Int, ind::T) where T <: Union{Symbol, Int}
     Tables.getcolumn(t, ind)[row]
 end
@@ -151,6 +169,17 @@ end
 function Base.show(io::IO, table::MetidaTable)
     pretty_table(io, table; tf = PrettyTables.tf_compact)
 end
+function Base.show(io::IO, row::MetidaTableRow)
+    print(io, "Row: (")
+    names = keys(table(getfield(row, :source)))
+    print(io, names[1], " = ", row[names[1]])
+    if length(names) > 1
+        for i = 2:length(names)
+            print(io, ", ", names[i], " = ", row[names[i]])
+        end
+    end
+    print(io, ")")
+end
 
 # All
 ################################################################################
@@ -180,6 +209,7 @@ Tables.rowaccess(::AbstractDataSet) = false
 function Base.getindex(d::DataSet, ind::Int)
     d.ds[ind]
 end
+
 @inline function getresultindex_safe(rd::T, ind::Symbol) where T <: AbstractResultData
     getindormiss(rd.result, ind)
 end
@@ -374,7 +404,14 @@ function TypedTables.Table(obj::MetidaTable)
     TypedTables.Table(obj.table)
 end
 
+# DataFrames.jl interface
+function DataFrames.DataFrame(obj::AbstractDataSet; kwargs...)
+    DataFrames.DataFrame(metida_table_(obj; kwargs...))
+end
 
+function DataFrames.DataFrame(obj::MetidaTable)
+    DataFrames.DataFrame(obj.table)
+end
 # MetidaFreq.jl
 struct Proportion <: AbstractData
     x::Int
