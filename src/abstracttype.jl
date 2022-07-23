@@ -2,7 +2,7 @@
 
 # Metida.jl
 
-abstract type MetidaModel <: StatisticalModel end
+abstract type MetidaModel <: RegressionModel  end
 
 abstract type AbstractCovarianceStructure end
 
