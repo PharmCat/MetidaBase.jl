@@ -353,6 +353,19 @@ function uniqueidlist(d::DataSet{T}, list::Symbol) where T <: AbstractIdData
     end
     dl
 end
+#=
+function uniqueidlist(d::DataSet{T}) where T <: AbstractIdData
+    dl = Vector{Dict}(undef, 0)
+    for i in d
+        id = getid(i)
+        if id ∉ dl push!(dl, id) end
+    end
+    dl
+end
+=#
+function uniqueidlist(::DataSet{T}, ::Nothing) where T <: AbstractIdData
+    nothing
+end
 
 
 function subset(d::DataSet{T}, sort::Dict) where T <: AbstractIdData
