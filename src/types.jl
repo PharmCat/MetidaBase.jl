@@ -210,6 +210,9 @@ function Base.getindex(d::DataSet, ind::Int)
     d.ds[ind]
 end
 
+Base.getindex(d::DataSet, inds::UnitRange{Int64}) = subset(d, inds)
+
+
 @inline function getresultindex_safe(rd::T, ind::Symbol) where T <: AbstractResultData
     getindormiss(rd.result, ind)
 end
@@ -349,6 +352,19 @@ function uniqueidlist(d::DataSet{T}, list::Symbol) where T <: AbstractIdData
         end
     end
     dl
+end
+#=
+function uniqueidlist(d::DataSet{T}) where T <: AbstractIdData
+    dl = Vector{Dict}(undef, 0)
+    for i in d
+        id = getid(i)
+        if id ∉ dl push!(dl, id) end
+    end
+    dl
+end
+=#
+function uniqueidlist(::DataSet{T}, ::Nothing) where T <: AbstractIdData
+    nothing
 end
 
 
