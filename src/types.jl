@@ -210,6 +210,9 @@ function Base.getindex(d::DataSet, ind::Int)
     d.ds[ind]
 end
 
+Base.getindex(d::DataSet, inds::UnitRange{Int64}) = subset(d, inds)
+
+
 @inline function getresultindex_safe(rd::T, ind::Symbol) where T <: AbstractResultData
     getindormiss(rd.result, ind)
 end
