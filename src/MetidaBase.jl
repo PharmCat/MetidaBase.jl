@@ -15,6 +15,9 @@ module MetidaBase
     import Base: getindex, length, ht_keyindex, show, pushfirst!, iterate, size, findfirst
 
     include("abstracttype.jl")
+    include("m_tables.jl")
+    include("dataset.jl")
+    include("tables.jl")
     include("types.jl")
     include("utils.jl")
     include("iterators.jl")

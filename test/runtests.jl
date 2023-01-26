@@ -1,8 +1,24 @@
 using MetidaBase
 using Test, Tables, TypedTables, DataFrames, CSV
 
+
+struct ExampleIDStruct <: MetidaBase.AbstractSubject
+    #time
+    #obs
+    id::Dict
+ end
+struct ExampleResultStruct{T} <: MetidaBase.AbstractSubjectResult{T}
+    data::T
+    result::Dict
+end
+
+
 @testset "MetidaBase.jl" begin
+
     io       = IOBuffer();
+#####################################################################
+# metida_table
+#####################################################################
     # Metida table names - auto
     mt = MetidaBase.metida_table([1,2,3], ["a", "b", "c"])
 
@@ -66,19 +82,10 @@ using Test, Tables, TypedTables, DataFrames, CSV
     mtd = MetidaBase.indsdict!(Dict(), mt[:, 1])
     @test mtd[2] == [4, 7, 10]
 
-    ############################################################################
-    # Structures
-    ############################################################################
-    struct ExampleIDStruct <: MetidaBase.AbstractSubject
-        #time
-        #obs
-        id::Dict
-    end
-
-    struct ExampleResultStruct{T} <: MetidaBase.AbstractSubjectResult{T}
-        data::T
-        result::Dict
-    end
+############################################################################
+# Structures
+############################################################################
+    
     exiddsv = Vector{ExampleIDStruct}(undef, 3)
     for i in 1:3
         exiddsv[i] = ExampleIDStruct(Dict(:a => 1, :b => 1))
@@ -168,14 +175,14 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test collect(keys(itr2))  == [1, 2]
     @test length(itr2) == 2
 
-    ############################################################################
-    # OTHER
+############################################################################
+ # OTHER
     @test MetidaBase.nonunique([1,2,3,3,4,5,6,6]) == [6,3]
 
     @test MetidaBase.sortbyvec!([1,2,3,4,5,6,7,8], [2,5,3,1,8,4,6,7]) == [2,5,3,1,8,4,6,7]
 
-    ############################################################################
-    # Ststutils
+############################################################################
+# Stat utils
     MetidaBase.sdfromcv(0.4) ≈ 0.38525317015992666
     MetidaBase.varfromcv(0.4) ≈ 0.1484200051182734
     MetidaBase.cvfromvar(0.4) ≈ 0.7013021443295824
