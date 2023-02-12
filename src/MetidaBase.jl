@@ -4,7 +4,7 @@
 __precompile__(true)
 module MetidaBase
 
-    using Tables, PrettyTables, StatsBase, StatsModels, Distributions, CategoricalArrays#, Reexport
+    using Tables, PrettyTables, StatsModels, CategoricalArrays#, Reexport
 
     #@reexport using StatsModels
     import DataFrames, TypedTables
