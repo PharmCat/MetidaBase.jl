@@ -30,11 +30,16 @@ function indsdict!(d::Dict, mt::MetidaTable)
     indsdict!(d, table(mt))
 end
 
+function findfirstvec(x, vec)
+    l = length(vec) + 1
+    res = findfirst(y -> x == y, vec)
+    if isnothing(res) return l else return res end
+end
 """
 Sort `a` by values of `vec`.
 """
 function sortbyvec!(a, vec)
-    sort!(a, by = x -> findfirst(y -> x == y, vec))
+    sort!(a, by = x -> findfirstvec(x, vec))
 end
 
 """
