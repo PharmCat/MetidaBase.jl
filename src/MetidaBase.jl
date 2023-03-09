@@ -5,7 +5,7 @@ module MetidaBase
     using Tables, PrettyTables, StatsModels, CategoricalArrays, Requires#, Reexport
 
     #@reexport using StatsModels
-    import DataFrames, TypedTables
+    #import DataFrames, TypedTables
     import StatsModels: StatisticalModel, RegressionModel
     import Tables: istable, columnaccess, columns, getcolumn, columnnames, schema, rowaccess, rows
     import CPUSummary: num_cores
