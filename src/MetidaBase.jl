@@ -6,6 +6,7 @@ module MetidaBase
 
     #@reexport using StatsModels
     #import DataFrames, TypedTables
+    import StatsBase
     import StatsModels: StatisticalModel, RegressionModel
     import Tables: istable, columnaccess, columns, getcolumn, columnnames, schema, rowaccess, rows
     import CPUSummary: num_cores
