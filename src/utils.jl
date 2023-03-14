@@ -1,4 +1,5 @@
 # Заполняет словарь d индексами индивидуальных значений
+
 function indsdict!(d::Dict, cdata::Union{Tuple, NamedTuple, AbstractVector{AbstractVector}})
     @inbounds for (i, element) in enumerate(zip(cdata...))
         ind = ht_keyindex(d, element)
@@ -30,11 +31,16 @@ function indsdict!(d::Dict, mt::MetidaTable)
     indsdict!(d, table(mt))
 end
 
+function findfirstvec(x, vec)
+    l = length(vec) + 1
+    res = findfirst(y -> x == y, vec)
+    if isnothing(res) return l else return res end
+end
 """
 Sort `a` by values of `vec`.
 """
 function sortbyvec!(a, vec)
-    sort!(a, by = x -> findfirst(y -> x == y, vec))
+    sort!(a, by = x -> findfirstvec(x, vec))
 end
 
 """
@@ -65,7 +71,6 @@ ispositive(x) = x > zero(x)
 ################################################################################
 
 # STATISTICS
-
 
 #CV2se
 """
