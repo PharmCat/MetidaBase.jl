@@ -2,18 +2,17 @@ using MetidaBase
 using Test, Tables, TypedTables, DataFrames, CSV
 
 
-struct ExampleIDStruct <: MetidaBase.AbstractSubject
-    #time
-    #obs
-    id::Dict
- end
-struct ExampleResultStruct{T} <: MetidaBase.AbstractSubjectResult{T}
-    data::T
-    result::Dict
-end
-
-
 @testset "MetidaBase.jl" begin
+
+    struct ExampleIDStruct <: MetidaBase.AbstractSubject
+        #time
+        #obs
+        id::Dict
+     end
+    struct ExampleResultStruct{T} <: MetidaBase.AbstractSubjectResult{T}
+        data::T
+        result::Dict
+    end
 
     io       = IOBuffer();
 #####################################################################

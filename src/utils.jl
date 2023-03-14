@@ -1,4 +1,5 @@
 # Заполняет словарь d индексами индивидуальных значений
+
 function indsdict!(d::Dict, cdata::Union{Tuple, NamedTuple, AbstractVector{AbstractVector}})
     @inbounds for (i, element) in enumerate(zip(cdata...))
         ind = ht_keyindex(d, element)
@@ -70,7 +71,6 @@ ispositive(x) = x > zero(x)
 ################################################################################
 
 # STATISTICS
-
 
 #CV2se
 """

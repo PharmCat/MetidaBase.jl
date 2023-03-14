@@ -4,8 +4,6 @@ module MetidaBase
 
     using Tables, PrettyTables, StatsModels, CategoricalArrays, Requires#, Reexport
 
-    #@reexport using StatsModels
-    #import DataFrames, TypedTables
     import StatsBase
     import StatsModels: StatisticalModel, RegressionModel
     import Tables: istable, columnaccess, columns, getcolumn, columnnames, schema, rowaccess, rows
@@ -19,6 +17,7 @@ module MetidaBase
     include("types.jl")
     include("utils.jl")
     include("iterators.jl")
+    include("precompile.jl")
 
     function __init__()
         @require DataFrames="a93c6f00-e57d-5684-b7b6-d8193f3e46c0" include("dataframes.jl")
