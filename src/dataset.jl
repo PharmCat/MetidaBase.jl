@@ -64,6 +64,19 @@ function Base.map(f, d::DataSet)
     DataSet(map(f, getdata(d)))
 end
 
+function Base.push!(d::DataSet, el)
+    push!(getdata(d), el)
+end
+
+function Base.append!(d::DataSet, d2::DataSet)
+    append!(getdata(d), getdata(d2))
+end
+
+function Base.append!(d::DataSet, el)
+    append!(getdata(d), el)
+end
+
+
 ################################################################################
 # BASE
 ################################################################################
@@ -169,16 +182,7 @@ function uniqueidlist(d::DataSet{T}, list::Symbol) where T <: AbstractIdData
     end
     dl
 end
-#=
-function uniqueidlist(d::DataSet{T}) where T <: AbstractIdData
-    dl = Vector{Dict}(undef, 0)
-    for i in d
-        id = getid(i)
-        if id ∉ dl push!(dl, id) end
-    end
-    dl
-end
-=#
+
 function uniqueidlist(::DataSet{T}, ::Nothing) where T <: AbstractIdData
     nothing
 end
