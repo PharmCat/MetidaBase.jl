@@ -1,6 +1,6 @@
-import SnoopPrecompile
+import PrecompileTools
 
-SnoopPrecompile.@precompile_all_calls begin
+PrecompileTools.@compile_workload begin
     sdfromcv(0.4)
     varfromcv(0.4)
     cvfromvar(0.4)
