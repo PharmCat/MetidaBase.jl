@@ -10,8 +10,7 @@ function getdata(d::DataSet)
 end
 
 @inline function getindormiss(d::Dict{K}, i::K) where K
-    ind::Int = ht_keyindex(d, i)
-    if ind > 0 return d.vals[ind]  end
+    if haskey(d, i) return d[i]  end
     missing
 end
 
@@ -41,7 +40,7 @@ function Base.getindex(d::DataSet{T}, col::Int, ind) where T <: AbstractResultDa
 end
 function Base.getindex(d::DataSet{T}, col::Colon, ind) where T <: AbstractResultData
     @inbounds for i in Base.OneTo(length(d))
-        if Base.ht_keyindex(d.ds[i].result, ind) < 1 return getresultindex_safe.(d.ds, ind) end
+        if !haskey(d.ds[i].result, ind) return getresultindex_safe.(d.ds, ind) end
     end
     getresultindex_unsafe.(d.ds, ind)
 end
@@ -149,13 +148,13 @@ function getid(d::DataSet{T}, col::Int, ind) where T <: Union{AbstractIdData, Ab
 end
 function getid(d::DataSet{T}, col::Colon, ind) where T <: AbstractIdData
     @inbounds for i in Base.OneTo(length(d))
-        if Base.ht_keyindex(d.ds[i].id, ind) < 1 return getid_safe.(d.ds, ind) end
+        if !haskey(d.ds[i].id, ind) return getid_safe.(d.ds, ind) end
     end
     getid_unsafe.(d.ds, ind)
 end
 function getid(d::DataSet{T}, col::Colon, ind) where T <: AbstractIDResult
     @inbounds for i in Base.OneTo(length(d))
-        if Base.ht_keyindex(d.ds[i].data.id, ind) < 1 return getid_safe.(d.ds, ind) end
+        if !haskey(d.ds[i].data.id, ind) return getid_safe.(d.ds, ind) end
     end
     getid_unsafe.(d.ds, ind)
 end

@@ -91,6 +91,17 @@ using Test, Tables, TypedTables, DataFrames, CSV
     end
     exidds = MetidaBase.DataSet(exiddsv)
     ############################################################################
+    item = ExampleIDStruct(Dict(:c => 6, :j => 6))
+    ds1 = deepcopy(exidds)
+    ds2 = deepcopy(exidds)
+    append!(ds1, ds2)
+    @test length(ds1) == 6
+    @test MetidaBase.getid(ds1[1])[:a] == MetidaBase.getid(ds1[4])[:a]
+    push!(ds1, item)
+    @test length(ds1) == 7
+    @test MetidaBase.getid(ds1[7]) === item.id
+
+    ############################################################################
     # DATASET Tests
     # Test length
     @test length(MetidaBase.getdata(exidds)) == length(exidds)
@@ -112,7 +123,9 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test exrsds[1, :r1] == 3
 
     @test MetidaBase.getid(exidds[3], :a) == 2
+    ######################################################################
     # SORT
+    ######################################################################
     sort!(exidds, :a)
     @test MetidaBase.getid(exidds[3], :a) == 3
     MetidaBase.getid(exrsds, :, :a)
@@ -120,6 +133,17 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test_nowarn sort!(exrsds, :a)
 
     @test first(exrsds) == exrsds[1]
+
+    @test_nowarn sort!(exrsds, [:a, :b])
+
+    ########################################################################
+    # findfirst
+    ########################################################################
+
+    @test MetidaBase.findfirst(exidds, Dict(:a => 1, :b => 1)) == 1
+
+    #######################################################################
+
 
     MetidaBase.uniqueidlist(exidds, [:a])
     MetidaBase.uniqueidlist(exidds, :a)
