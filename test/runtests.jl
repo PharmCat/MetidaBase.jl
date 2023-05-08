@@ -189,6 +189,11 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test collect(keys(itr1))  == [1, 2, 3, 6]
     @test length(itr1) == 4
 
+    @test getindex(itr1, 1) == 1
+    @test_nowarn eltype(itr1)
+    @test_throws ErrorException itr1[4]
+    @test_throws ErrorException itr1[5]
+
     itr2 = MetidaBase.skipnonpositive(v1)
     for i in itr2
         @test MetidaBase.ispositive(i)
@@ -197,6 +202,14 @@ using Test, Tables, TypedTables, DataFrames, CSV
     eltype(itr2)
     @test collect(keys(itr2))  == [1, 2]
     @test length(itr2) == 2
+
+    @test getindex(itr2, 2) == 2
+    @test_nowarn eltype(itr2)
+    @test_throws ErrorException itr2[3]
+    @test_throws ErrorException itr2[4]
+    @test_throws ErrorException itr2[5]
+    @test_throws ErrorException itr2[6]
+    
 
 ############################################################################
  # OTHER
