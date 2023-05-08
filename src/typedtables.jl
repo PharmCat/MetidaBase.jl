@@ -1,4 +1,5 @@
 # TypedTables.jl interface
+
 function TypedTables.Table(obj::AbstractDataSet; kwargs...)
     TypedTables.Table(metida_table_(obj; kwargs...))
 end
