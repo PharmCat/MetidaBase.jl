@@ -9,7 +9,7 @@ function getdata(d::DataSet)
     d.ds
 end
 
-@inline function getindormiss(d::Dict{K}, i::K) where K
+@inline function getindormiss(d::AbstractDict{K}, i::K) where K
     if haskey(d, i) return d[i]  end
     missing
 end
@@ -81,7 +81,7 @@ end
 ################################################################################
 # sort!
 ################################################################################
-function islessdict(a::Dict{A1,A2}, b::Dict{B1,B2}, k::Union{AbstractVector, Set}) where A1 where A2 where B1 where B2
+function islessdict(a::AbstractDict{A1,A2}, b::AbstractDict{B1,B2}, k::Union{AbstractVector, Set}) where A1 where A2 where B1 where B2
     l = length(k)
     av = Vector{Union{Missing, A2}}(undef, l)
     bv = Vector{Union{Missing, B2}}(undef, l)
@@ -91,7 +91,7 @@ function islessdict(a::Dict{A1,A2}, b::Dict{B1,B2}, k::Union{AbstractVector, Set
     end
     isless(av, bv)
 end
-function islessdict(a::Dict, b::Dict, k)
+function islessdict(a::AbstractDict, b::AbstractDict, k)
     isless(getindormiss(a, k), getindormiss(b, k))
 end
 function Base.sort!(d::DataSet{T}, k; alg::Base.Algorithm = QuickSort, lt=nothing, by=nothing, rev::Bool=false, order::Base.Ordering = Base.Forward) where T <: Union{AbstractIdData, AbstractIDResult}

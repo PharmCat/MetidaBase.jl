@@ -91,6 +91,9 @@ using Test, Tables, TypedTables, DataFrames, CSV
     end
     exidds = MetidaBase.DataSet(exiddsv)
     ############################################################################
+    @test Tables.istable(exidds) == false
+    @test Tables.rowaccess(exidds) == false
+    ############################################################################
     item = ExampleIDStruct(Dict(:c => 6, :j => 6))
     ds1 = deepcopy(exidds)
     ds2 = deepcopy(exidds)
@@ -123,6 +126,11 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test exrsds[1, :r1] == 3
 
     @test MetidaBase.getid(exidds[3], :a) == 2
+
+    dsr = exrsds[1:2]
+    @test length(dsr) == 2
+    @test exrsds[1] === dsr[1]
+    @test exrsds[2] === dsr[2]
     ######################################################################
     # SORT
     ######################################################################
