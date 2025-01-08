@@ -101,7 +101,7 @@ end
 """
     cvfromsd(σ::Real)::AbstractFloat
 
-CV from variance.
+CV from LnSD.
 """
 function cvfromsd(σ)
     return sqrt(exp(σ^2) - 1)

@@ -106,12 +106,27 @@ end
 # filter!
 ################################################################################
 function Base.filter(f::Function, d::DataSet)
-    ds   =  getdata(d)
-    inds  = findall(f, ds)
-    DataSet(ds[inds])
+    DataSet(filter(f, getdata(d)))
 end
 function Base.filter!(f::Function, d::DataSet)
     filter!(f, getdata(d))
+    d
+end
+
+function Base.filter(f::Dict{:Symbol, Function}, d::DataSet)
+    k = keys(f)
+    a = filter(x -> f[first(k)](getid(x, first(k))), getdata(d))
+    if length(k) > 1
+        for kn = 2:length(k)
+            filter!(x -> f[k[kn]](getid(x, k[kn])), a)
+        end
+    end
+    DataSet(a)
+end
+function Base.filter!(f::Dict{:Symbol, Function}, d::DataSet)
+    for k in keys(f)
+        filter!(x -> f[k](getid(x, k)), getdata(d))
+    end
     d
 end
 
@@ -122,6 +137,41 @@ end
 function Base.findfirst(d::DataSet{<: AbstractIdData}, sort::Dict)
     findfirst(x-> sort ⊆ getid(x), getdata(d))
 end
+
+################################################################################
+# Base.findlast
+################################################################################
+
+function Base.findlast(d::DataSet{<: AbstractIdData}, sort::Dict)
+    findlast(x-> sort ⊆ getid(x), getdata(d))
+end
+
+################################################################################
+# Base.findnext
+################################################################################
+
+function Base.findnext(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+    findnext(x-> sort ⊆ getid(x), getdata(d), i)
+end
+
+
+################################################################################
+# Base.findprev 
+################################################################################
+
+function Base.findprev(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+    findprev(x-> sort ⊆ getid(x), getdata(d), i)
+end
+
+################################################################################
+# Base.findall 
+################################################################################
+
+function Base.findall(d::DataSet{<: AbstractIdData}, sort::Dict)
+    findall(x-> sort ⊆ getid(x), getdata(d))
+end
+
+
 
 ################################################################################
 # SELF

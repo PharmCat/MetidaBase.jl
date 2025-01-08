@@ -9,7 +9,9 @@ module MetidaBase
     import Tables: istable, columnaccess, columns, getcolumn, columnnames, schema, rowaccess, rows
     import CPUSummary: num_cores
 
-    import Base: getindex, length, ht_keyindex, show, pushfirst!, iterate, size, findfirst, push!, append!
+    import Base: getindex, length, ht_keyindex, show, pushfirst!, iterate, size, findfirst, findlast, findall, findnext, findprev, push!, append!
+
+    export DataSet, MetidaTable, getdata, getid
 
     include("abstracttype.jl")
     include("m_tables.jl")
