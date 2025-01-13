@@ -1,7 +1,7 @@
 name = "MetidaBase"
 uuid = "075456b7-4006-432f-9324-2f8453996c49"
 authors = ["PharmCat <v.s.arnautov@yandex.ru> and contributors"]
-version = "0.12.1"
+version = "0.13.0"
 
 [deps]
 CategoricalArrays = "324d7699-5711-5eae-9e2f-1d82baa6b597"

@@ -25,7 +25,7 @@ function Base.getindex(d::DataSet, ind::Int)
     d.ds[ind]
 end
 
-Base.getindex(d::DataSet, inds::UnitRange{Int64}) = subset(d, inds)
+Base.getindex(d::DataSet, inds) = subset(d, inds)
 
 
 @inline function getresultindex_safe(rd::T, ind::Symbol) where T <: AbstractResultData
@@ -34,6 +34,8 @@ end
 @inline function getresultindex_unsafe(rd::T, ind::Symbol) where T <: AbstractResultData
     rd.result[ind]
 end
+getresultindex_safe(rd, ind::AbstractString)   = getresultindex_safe(rd, Symbol(ind))
+getresultindex_unsafe(rd, ind::AbstractString) = getresultindex_unsafe(rd, Symbol(ind))
 
 function Base.getindex(d::DataSet{T}, col::Int, ind) where T <: AbstractResultData
     getresultindex_safe(d[col], ind)
@@ -171,8 +173,50 @@ function Base.findall(d::DataSet{<: AbstractIdData}, sort::Dict)
     findall(x-> sort ⊆ getid(x), getdata(d))
 end
 
+################################################################################
+# find*el
+################################################################################
 
-
+function findfirstel(d::DataSet{<: AbstractIdData}, sort::Dict)
+    ind = findfirst(x-> sort ⊆ getid(x), getdata(d))
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
+function Base.findlastel(d::DataSet{<: AbstractIdData}, sort::Dict)
+    ind = findlast(x-> sort ⊆ getid(x), getdata(d))
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
+function Base.findnextel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+    ind = findnext(x-> sort ⊆ getid(x), getdata(d), i)
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
+function Base.findprevel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+    ind = findprev(x-> sort ⊆ getid(x), getdata(d), i)
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
+function Base.findallel(d::DataSet{<: AbstractIdData}, sort::Dict)
+    ind = findall(x-> sort ⊆ getid(x), getdata(d))
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
 ################################################################################
 # SELF
 ################################################################################
