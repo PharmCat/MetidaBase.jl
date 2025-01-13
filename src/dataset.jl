@@ -25,7 +25,7 @@ function Base.getindex(d::DataSet, ind::Int)
     d.ds[ind]
 end
 
-Base.getindex(d::DataSet, inds::UnitRange{Int64}) = subset(d, inds)
+Base.getindex(d::DataSet, inds) = subset(d, inds)
 
 
 @inline function getresultindex_safe(rd::T, ind::Symbol) where T <: AbstractResultData
@@ -34,6 +34,8 @@ end
 @inline function getresultindex_unsafe(rd::T, ind::Symbol) where T <: AbstractResultData
     rd.result[ind]
 end
+getresultindex_safe(rd, ind::AbstractString)   = getresultindex_safe(rd, Symbol(ind))
+getresultindex_unsafe(rd, ind::AbstractString) = getresultindex_unsafe(rd, Symbol(ind))
 
 function Base.getindex(d::DataSet{T}, col::Int, ind) where T <: AbstractResultData
     getresultindex_safe(d[col], ind)
@@ -106,12 +108,27 @@ end
 # filter!
 ################################################################################
 function Base.filter(f::Function, d::DataSet)
-    ds   =  getdata(d)
-    inds  = findall(f, ds)
-    DataSet(ds[inds])
+    DataSet(filter(f, getdata(d)))
 end
 function Base.filter!(f::Function, d::DataSet)
     filter!(f, getdata(d))
+    d
+end
+
+function Base.filter(f::Dict{:Symbol, Function}, d::DataSet)
+    k = keys(f)
+    a = filter(x -> f[first(k)](getid(x, first(k))), getdata(d))
+    if length(k) > 1
+        for kn = 2:length(k)
+            filter!(x -> f[k[kn]](getid(x, k[kn])), a)
+        end
+    end
+    DataSet(a)
+end
+function Base.filter!(f::Dict{:Symbol, Function}, d::DataSet)
+    for k in keys(f)
+        filter!(x -> f[k](getid(x, k)), getdata(d))
+    end
     d
 end
 
@@ -123,6 +140,83 @@ function Base.findfirst(d::DataSet{<: AbstractIdData}, sort::Dict)
     findfirst(x-> sort ⊆ getid(x), getdata(d))
 end
 
+################################################################################
+# Base.findlast
+################################################################################
+
+function Base.findlast(d::DataSet{<: AbstractIdData}, sort::Dict)
+    findlast(x-> sort ⊆ getid(x), getdata(d))
+end
+
+################################################################################
+# Base.findnext
+################################################################################
+
+function Base.findnext(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+    findnext(x-> sort ⊆ getid(x), getdata(d), i)
+end
+
+
+################################################################################
+# Base.findprev 
+################################################################################
+
+function Base.findprev(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+    findprev(x-> sort ⊆ getid(x), getdata(d), i)
+end
+
+################################################################################
+# Base.findall 
+################################################################################
+
+function Base.findall(d::DataSet{<: AbstractIdData}, sort::Dict)
+    findall(x-> sort ⊆ getid(x), getdata(d))
+end
+
+################################################################################
+# find*el
+################################################################################
+
+function findfirstel(d::DataSet{<: AbstractIdData}, sort::Dict)
+    ind = findfirst(x-> sort ⊆ getid(x), getdata(d))
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
+function findlastel(d::DataSet{<: AbstractIdData}, sort::Dict)
+    ind = findlast(x-> sort ⊆ getid(x), getdata(d))
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
+function findnextel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+    ind = findnext(x-> sort ⊆ getid(x), getdata(d), i)
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
+function findprevel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+    ind = findprev(x-> sort ⊆ getid(x), getdata(d), i)
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
+function findallel(d::DataSet{<: AbstractIdData}, sort::Dict)
+    ind = findall(x-> sort ⊆ getid(x), getdata(d))
+    if isnothing(ind)
+        return nothing
+    else
+        return d[ind]
+    end
+end
 ################################################################################
 # SELF
 ################################################################################

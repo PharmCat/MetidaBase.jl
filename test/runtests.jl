@@ -149,7 +149,10 @@ using Test, Tables, TypedTables, DataFrames, CSV
     ########################################################################
 
     @test MetidaBase.findfirst(exidds, Dict(:a => 1, :b => 1)) == 1
-
+    @test MetidaBase.findlast(exidds, Dict(:a => 1, :b => 1)) == 1
+    @test MetidaBase.findall(exidds, Dict(:a => 1, :b => 1)) == [1]  
+    @test MetidaBase.findnext(exidds, Dict(:a => 2, :b => 3), 1) ==2
+    @test MetidaBase.findprev(exidds, Dict(:a => 2, :b => 3), 3) == 2
     #######################################################################
 
 
