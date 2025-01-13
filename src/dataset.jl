@@ -185,7 +185,7 @@ function findfirstel(d::DataSet{<: AbstractIdData}, sort::Dict)
         return d[ind]
     end
 end
-function Base.findlastel(d::DataSet{<: AbstractIdData}, sort::Dict)
+function findlastel(d::DataSet{<: AbstractIdData}, sort::Dict)
     ind = findlast(x-> sort ⊆ getid(x), getdata(d))
     if isnothing(ind)
         return nothing
@@ -193,7 +193,7 @@ function Base.findlastel(d::DataSet{<: AbstractIdData}, sort::Dict)
         return d[ind]
     end
 end
-function Base.findnextel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+function findnextel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
     ind = findnext(x-> sort ⊆ getid(x), getdata(d), i)
     if isnothing(ind)
         return nothing
@@ -201,7 +201,7 @@ function Base.findnextel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
         return d[ind]
     end
 end
-function Base.findprevel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
+function findprevel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
     ind = findprev(x-> sort ⊆ getid(x), getdata(d), i)
     if isnothing(ind)
         return nothing
@@ -209,7 +209,7 @@ function Base.findprevel(d::DataSet{<: AbstractIdData}, sort::Dict, i::Int)
         return d[ind]
     end
 end
-function Base.findallel(d::DataSet{<: AbstractIdData}, sort::Dict)
+function findallel(d::DataSet{<: AbstractIdData}, sort::Dict)
     ind = findall(x-> sort ⊆ getid(x), getdata(d))
     if isnothing(ind)
         return nothing
