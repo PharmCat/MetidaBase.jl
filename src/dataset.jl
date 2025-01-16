@@ -3,6 +3,13 @@
 ################################################################################
 struct DataSet{T <: AbstractData} <: AbstractDataSet{AbstractData}
     ds::Vector{T}
+    metadata::Dict
+    function DataSet(ds::AbstractVector{T}, metadata::Dict) where T <: AbstractData
+        new{T}(ds, metadata)::DataSet
+    end
+    function DataSet(ds)
+        DataSet(ds, Dict{Symbol, Any}())
+    end
 end
 
 function getdata(d::DataSet)

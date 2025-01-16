@@ -67,6 +67,18 @@ ispositive(::Nothing) = false
 ispositive(x::AbstractFloat) = isnan(x) ? false : x > zero(x)
 ispositive(x) = x > zero(x)
 
+
+
+################################################################################
+# Group keyword parsing
+################################################################################
+
+parse_gkw(s::String) = [Symbol(s)]
+parse_gkw(s::Symbol) = [s]
+parse_gkw(s::AbstractVector{<:AbstractString}) = Symbol.(s)
+parse_gkw(s::AbstractVector{Symbol}) = s
+
+
 ################################################################################
 ################################################################################
 

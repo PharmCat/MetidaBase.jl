@@ -121,6 +121,9 @@ using Test, Tables, TypedTables, DataFrames, CSV
     end
     exrsds = MetidaBase.DataSet(exrsdsv)
 
+    # metadata
+    dsmeta = MetidaBase.DataSet(exrsdsv, Dict(:name => "SomeName"))
+
     # Index
     @test exrsds[:, :r1][1] == 3
     @test exrsds[1, :r1] == 3
@@ -235,4 +238,9 @@ using Test, Tables, TypedTables, DataFrames, CSV
     MetidaBase.cvfromvar(0.4) ≈ 0.7013021443295824
     MetidaBase.cvfromsd(0.4) ≈ 0.41654636115540644
 
+
+    @test  MetidaBase.parse_gkw("s")    == [:s]
+    @test  MetidaBase.parse_gkw(:s)     == [:s]
+    @test  MetidaBase.parse_gkw([:s])   == [:s]
+    @test  MetidaBase.parse_gkw(["s"])  == [:s]
 end
