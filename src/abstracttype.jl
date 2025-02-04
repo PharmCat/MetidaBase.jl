@@ -24,13 +24,8 @@ abstract type AbstractIdData <: AbstractData end
 # All have field:  result::Dict
 abstract type AbstractResultData <: AbstractData end
 
-function Base.getindex(a::T, s::Symbol) where T <: AbstractResultData
-    return a.result[s]
-end
-
 # All have field: result::Dict, data::AbstractIdData
 abstract type  AbstractIDResult{AbstractIdData} <: AbstractResultData end
-
 
 # MetidaFreq.jl
 
