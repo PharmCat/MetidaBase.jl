@@ -125,7 +125,7 @@ function Base.filter!(f::Function, d::DataSet)
     d
 end
 
-function Base.filter(f::Dict{:Symbol, Function}, d::DataSet)
+function Base.filter(f::Dict{Symbol, <:Function}, d::DataSet)
     k = keys(f)
     a = filter(x -> f[first(k)](getid(x, first(k))), getdata(d))
     if length(k) > 1
@@ -135,7 +135,7 @@ function Base.filter(f::Dict{:Symbol, Function}, d::DataSet)
     end
     DataSet(a)
 end
-function Base.filter!(f::Dict{:Symbol, Function}, d::DataSet)
+function Base.filter!(f::Dict{Symbol, <:Function}, d::DataSet)
     for k in keys(f)
         filter!(x -> f[k](getid(x, k)), getdata(d))
     end
