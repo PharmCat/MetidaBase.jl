@@ -77,6 +77,16 @@ parse_gkw(s::String) = [Symbol(s)]
 parse_gkw(s::Symbol) = [s]
 parse_gkw(s::AbstractVector{<:AbstractString}) = Symbol.(s)
 parse_gkw(s::AbstractVector{Symbol}) = s
+parse_gkw(s::AbstractVector{Union{AbstractString, Symbol}}) = Symbol.(s)
+function parse_gkw(s::AbstractVector)
+    if all(x-> isa(x, Union{AbstractString, Symbol}), s)
+        return Symbol.(s)
+    end
+    throw(ArgumentError("Argument should be String, Symbol or AbstractVector{Union{AbstractString, Symbol}}"))
+end
+parse_gkw(s) = throw(ArgumentError("Argument should be String, Symbol or AbstractVector{Union{AbstractString, Symbol}}"))
+
+
 
 
 ################################################################################

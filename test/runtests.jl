@@ -291,6 +291,19 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test  MetidaBase.parse_gkw([:s])   == [:s]
     @test  MetidaBase.parse_gkw(["s"])  == [:s]
 
+    arvec = Vector{Union{AbstractString, Symbol}}(undef, 2)
+    arvec[1] = :a
+    arvec[2] = "b"
+    @test  MetidaBase.parse_gkw(arvec)  == [:a, :b]
+
+    arvec = Vector{Any}(undef, 2)
+    arvec[1] = :a
+    arvec[2] = "b"
+    @test  MetidaBase.parse_gkw(arvec)  == [:a, :b]
+
+    @test_throws ArgumentError MetidaBase.parse_gkw([1,2])
+    @test_throws ArgumentError MetidaBase.parse_gkw(1)
+
 # ExampleResultData
 
 
