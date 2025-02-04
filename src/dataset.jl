@@ -34,6 +34,9 @@ end
 
 Base.getindex(d::DataSet, inds) = subset(d, inds)
 
+function Base.getindex(a::T, s::Symbol) where T <: AbstractResultData
+    return a.result[s]
+end
 
 @inline function getresultindex_safe(rd::T, ind::Symbol) where T <: AbstractResultData
     getindormiss(rd.result, ind)

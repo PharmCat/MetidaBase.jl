@@ -14,6 +14,10 @@ using Test, Tables, TypedTables, DataFrames, CSV
         result::Dict
     end
 
+    struct ExampleResultData <: MetidaBase.AbstractResultData
+        result::Dict
+    end
+
     io       = IOBuffer();
 #####################################################################
 # metida_table
@@ -115,6 +119,13 @@ using Test, Tables, TypedTables, DataFrames, CSV
     MetidaBase.getid(exidds[3])[:b] = 3
     MetidaBase.getid(exidds, :, :a)
 
+    @test MetidaBase.getid_safe(exidds[2], :a) == 3
+    @test MetidaBase.getid_safe(exidds[2], :wrongindex) === missing
+
+    @test MetidaBase.getid_unsafe(exidds[2], :a) == 3
+    @test_throws KeyError MetidaBase.getid_unsafe(exidds[2], :wrongindex) 
+
+
     exrsdsv = Vector{ExampleResultStruct}(undef, length(exidds))
     for i in 1:length(exidds)
         exrsdsv[i] = ExampleResultStruct(exidds[i], Dict(:r1 => 3, :r2 => 4))
@@ -134,6 +145,12 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test length(dsr) == 2
     @test exrsds[1] === dsr[1]
     @test exrsds[2] === dsr[2]
+
+    @test MetidaBase.getresultindex_safe(exrsds[2], :wrongindex) === missing
+    @test MetidaBase.getresultindex_safe(exrsds[2], :r1) == 3
+    @test_throws KeyError MetidaBase.getresultindex_unsafe(exrsds[2], :wrongindex) 
+    @test MetidaBase.getresultindex_unsafe(exrsds[2], :r1) == 3
+
     ######################################################################
     # SORT
     ######################################################################
@@ -154,10 +171,36 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test MetidaBase.findfirst(exidds, Dict(:a => 1, :b => 1)) == 1
     @test MetidaBase.findlast(exidds, Dict(:a => 1, :b => 1)) == 1
     @test MetidaBase.findall(exidds, Dict(:a => 1, :b => 1)) == [1]  
-    @test MetidaBase.findnext(exidds, Dict(:a => 2, :b => 3), 1) ==2
+    @test MetidaBase.findnext(exidds, Dict(:a => 2, :b => 3), 1) == 2
     @test MetidaBase.findprev(exidds, Dict(:a => 2, :b => 3), 3) == 2
     #######################################################################
 
+    ########################################################################
+    # find*el
+    ########################################################################
+    MetidaBase.getid(exidds[2])[:check] = true
+
+    el =  MetidaBase.findfirstel(exidds, Dict(:a => 1, :b => 1)) 
+    @test MetidaBase.getid(el)[:a] == 1
+    @test MetidaBase.getid(el)[:b] == 1
+    el =  MetidaBase.findlastel(exidds, Dict(:a => 1, :b => 1)) 
+    @test MetidaBase.getid(el)[:a] == 1 
+    @test MetidaBase.getid(el)[:b] == 1
+    el =  MetidaBase.findnextel(exidds, Dict(:a => 2, :b => 3), 1) 
+    @test MetidaBase.getid(el)[:a] == 2
+    @test MetidaBase.getid(el)[:b] == 3
+    @test MetidaBase.getid(el)[:check] == true
+    el =  MetidaBase.findprevel(exidds, Dict(:a => 2, :b => 3), 3) 
+    @test MetidaBase.getid(el)[:a] == 2
+    @test MetidaBase.getid(el)[:b] == 3
+    @test MetidaBase.getid(el)[:check] == true
+
+    els = MetidaBase.findallel(exidds, Dict(:a => 2, :b => 3))
+    @test length(els) == 1
+    @test MetidaBase.getid(els[1])[:a] == 2
+    @test MetidaBase.getid(els[1])[:b] == 3
+    @test MetidaBase.getid(els[1])[:check] == true
+    ########################################################################
 
     MetidaBase.uniqueidlist(exidds, [:a])
     MetidaBase.uniqueidlist(exidds, :a)
@@ -165,6 +208,10 @@ using Test, Tables, TypedTables, DataFrames, CSV
     MetidaBase.subset(exidds, Dict(:a => 1))
     MetidaBase.subset(exrsds, Dict(:a => 1))
     MetidaBase.subset(exrsds, 1:2)
+
+    zsbst = MetidaBase.subset(exidds, Dict(:a => 10))
+    @test length(MetidaBase.getdata(zsbst)) == 0
+
 
     @test_nowarn map(identity, exidds)
 
@@ -243,4 +290,7 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test  MetidaBase.parse_gkw(:s)     == [:s]
     @test  MetidaBase.parse_gkw([:s])   == [:s]
     @test  MetidaBase.parse_gkw(["s"])  == [:s]
+
+# ExampleResultData
+
 end
