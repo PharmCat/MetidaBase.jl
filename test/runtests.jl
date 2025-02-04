@@ -54,9 +54,17 @@ using Test, Tables, TypedTables, DataFrames, CSV
     # Tst size
     @test size(mt, 1) == 5
     @test size(mt, 2) == 2
+    @test_throws ErrorException size(mt, 3) 
 
     # Tables rows method
     rows = Tables.rows(mt)
+
+    mt2 = MetidaBase.metida_table(NamedTuple{(:b, :a)}(([1,2,3], ["a", "b", "c"])))
+    for r in mt2
+        @test_nowarn Base.show(io, r)
+        @test Tables.getcolumn(r, :b) in [1,2,3] 
+        @test Tables.columnnames(r) == [:b, :a]
+    end
 
     # MetidaTable > TypedTables
     df = Table(mt)
@@ -108,6 +116,10 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test length(ds1) == 7
     @test MetidaBase.getid(ds1[7]) === item.id
 
+    append!(ds1, [item])
+    @test length(ds1) == 8
+    @test MetidaBase.getid(ds1[8]) === item.id
+
     ############################################################################
     # DATASET Tests
     # Test length
@@ -150,6 +162,11 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test MetidaBase.getresultindex_safe(exrsds[2], :r1) == 3
     @test_throws KeyError MetidaBase.getresultindex_unsafe(exrsds[2], :wrongindex) 
     @test MetidaBase.getresultindex_unsafe(exrsds[2], :r1) == 3
+
+    @test MetidaBase.getresultindex_safe(exrsds[2], "wrongindex") === missing
+    @test MetidaBase.getresultindex_safe(exrsds[2], "r1") == 3
+    @test_throws KeyError MetidaBase.getresultindex_unsafe(exrsds[2], "wrongindex") 
+    @test MetidaBase.getresultindex_unsafe(exrsds[2], "r1") == 3
 
     ######################################################################
     # SORT
@@ -202,8 +219,15 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test MetidaBase.getid(els[1])[:check] == true
     ########################################################################
 
-    MetidaBase.uniqueidlist(exidds, [:a])
-    MetidaBase.uniqueidlist(exidds, :a)
+    udl = MetidaBase.uniqueidlist(exidds, [:a])
+    @test udl[1] == Dict(:a => 1)
+    @test udl[2] == Dict(:a => 2)
+    @test udl[3] == Dict(:a => 3)
+    udl = MetidaBase.uniqueidlist(exidds, :a)
+    @test udl[1] == Dict(:a => 1)
+    @test udl[2] == Dict(:a => 2)
+    @test udl[3] == Dict(:a => 3)
+    @test  MetidaBase.uniqueidlist(exidds, nothing) === nothing
 
     MetidaBase.subset(exidds, Dict(:a => 1))
     MetidaBase.subset(exrsds, Dict(:a => 1))
@@ -215,11 +239,18 @@ using Test, Tables, TypedTables, DataFrames, CSV
 
     @test_nowarn map(identity, exidds)
 
+    fl1 = filter!(Dict(:a => x -> x == 1), deepcopy(exidds))
+    fl2 = filter(Dict(:a => x -> x == 1), exidds)
+    @test MetidaBase.getid(fl1[1])[:a] == 1
+    @test MetidaBase.getid(fl2[1])[:a] == 1
+
     filtexrsds = filter(x -> x.id[:a] == 2, exidds)
     filter!(x -> x.id[:a] == 2, exidds)
 
     @test length(filtexrsds) == length(exidds)
     @test filtexrsds[1].id[:a] == exidds[1].id[:a] == 2
+
+    
 
     ############################################################################
     # Table
@@ -270,8 +301,16 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test_throws ErrorException itr2[4]
     @test_throws ErrorException itr2[5]
     @test_throws ErrorException itr2[6]
-    
 
+
+    @test MetidaBase.ispositive(missing) == false
+    @test MetidaBase.ispositive(nothing) == false
+    @test MetidaBase.ispositive(0) == false
+    
+    @test MetidaBase.isnanormissing(1) == false
+    @test MetidaBase.isnanormissing(1.0) == false
+    @test MetidaBase.isnanormissing(NaN) == true
+    @test MetidaBase.isnanormissing(missing) == true
 ############################################################################
  # OTHER
     @test MetidaBase.nonunique([1,2,3,3,4,5,6,6]) == [6,3]
@@ -290,6 +329,19 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test  MetidaBase.parse_gkw(:s)     == [:s]
     @test  MetidaBase.parse_gkw([:s])   == [:s]
     @test  MetidaBase.parse_gkw(["s"])  == [:s]
+
+    arvec = Vector{Union{AbstractString, Symbol}}(undef, 2)
+    arvec[1] = :a
+    arvec[2] = "b"
+    @test  MetidaBase.parse_gkw(arvec)  == [:a, :b]
+
+    arvec = Vector{Any}(undef, 2)
+    arvec[1] = :a
+    arvec[2] = "b"
+    @test  MetidaBase.parse_gkw(arvec)  == [:a, :b]
+
+    @test_throws ArgumentError MetidaBase.parse_gkw([1,2])
+    @test_throws ArgumentError MetidaBase.parse_gkw(1)
 
 # ExampleResultData
 
