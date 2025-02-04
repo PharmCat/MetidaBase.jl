@@ -293,4 +293,18 @@ using Test, Tables, TypedTables, DataFrames, CSV
 
 # ExampleResultData
 
+
+    erd = Vector{ExampleResultData}(undef, 10)
+    for i in 1:10
+        erd[i] = ExampleResultData(Dict(:p1 => 3, :p2 => :param, :p3 => true))
+    end
+    erdds = MetidaBase.DataSet(erd)
+
+    @test getindex(erdds[1], :p1) == 3
+
+    @test MetidaBase.getresultindex_safe(erdds[1], :p1) == 3
+    @test MetidaBase.getresultindex_safe(erdds[1], :wrongindex) === missing
+
+    @test MetidaBase.getresultindex_unsafe(erdds[1], :p1) == 3
+    @test_throws KeyError MetidaBase.getresultindex_unsafe(erdds[1], :wrongindex) 
 end
