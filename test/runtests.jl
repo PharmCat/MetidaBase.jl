@@ -244,13 +244,21 @@ using Test, Tables, TypedTables, DataFrames, CSV
     @test MetidaBase.getid(fl1[1])[:a] == 1
     @test MetidaBase.getid(fl2[1])[:a] == 1
 
+    fl1 = filter!(:a => x -> x == 1, deepcopy(exidds))
+    fl2 = filter(:a => x -> x == 1, exidds)
+    @test MetidaBase.getid(fl1[1])[:a] == 1
+    @test MetidaBase.getid(fl2[1])[:a] == 1
+
+    fl1 = filter!(Dict(:a => x -> x < 3, :b => x -> x == 3), deepcopy(exidds))
+    fl2 = filter(Dict(:a => x -> x < 3, :b => x -> x == 3), exidds)
+    @test MetidaBase.getid(fl1[1])[:a] == 2
+    @test MetidaBase.getid(fl2[1])[:a] == 2
+
     filtexrsds = filter(x -> x.id[:a] == 2, exidds)
     filter!(x -> x.id[:a] == 2, exidds)
 
     @test length(filtexrsds) == length(exidds)
     @test filtexrsds[1].id[:a] == exidds[1].id[:a] == 2
-
-    
 
     ############################################################################
     # Table
