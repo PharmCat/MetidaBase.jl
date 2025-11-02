@@ -126,7 +126,7 @@ function Base.filter!(f::Function, d::DataSet)
 end
 
 function Base.filter(f::Dict{Symbol, <:Function}, d::DataSet)
-    k = keys(f)
+    k = collect(keys(f))
     a = filter(x -> f[first(k)](getid(x, first(k))), getdata(d))
     if length(k) > 1
         for kn = 2:length(k)
@@ -139,6 +139,19 @@ function Base.filter!(f::Dict{Symbol, <:Function}, d::DataSet)
     for k in keys(f)
         filter!(x -> f[k](getid(x, k)), getdata(d))
     end
+    d
+end
+
+function Base.filter(p::Pair{Symbol, <:Function}, d::DataSet)
+    k = p[1]
+    f = p[2]
+    a = filter(x -> f(getid(x, k)), getdata(d))
+    DataSet(a)
+end
+function Base.filter!(p::Pair{Symbol, <:Function}, d::DataSet)
+    k = p[1]
+    f = p[2]
+    a = filter!(x -> f(getid(x, k)), getdata(d))
     d
 end
 
@@ -263,6 +276,22 @@ function getid(d::DataSet{T}, col::Colon, ind) where T <: AbstractIDResult
     getid_unsafe.(d.ds, ind)
 end
 
+#####################################################################
+
+function idkeys(data::DataSet{T}) where T <: AbstractIdData
+    d = getdata(data)
+    s = Set(keys(getid(first(d))))
+    if length(d) > 1
+        for i = 2:length(d)
+            for k in keys(getid(d[i]))
+                push!(s, k)
+            end
+        end
+    end
+    s
+end
+
+#####################################################################
 
 function uniqueidlist(d::DataSet{T}, list::AbstractVector{Symbol}) where T <: AbstractIdData
     dl = Vector{Dict}(undef, 0)

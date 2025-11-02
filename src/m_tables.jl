@@ -164,7 +164,7 @@ function Base.size(t::MetidaTable, i::Int)
 end
 
 function Base.show(io::IO, table::MetidaTable)
-    pretty_table(io, table; tf = PrettyTables.tf_compact)
+    pretty_table(io, table; table_format = TextTableFormat(borders = text_table_borders__compact))
 end
 function Base.show(io::IO, row::MetidaTableRow)
     print(io, "Row: (")

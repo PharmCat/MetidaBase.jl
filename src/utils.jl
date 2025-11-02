@@ -57,7 +57,7 @@ Return `true` if value NaN or Missing.
 """
 isnanormissing(x::Number) = isnan(x)
 isnanormissing(x::AbstractFloat) = isnan(x)
-isnanormissing(x::Missing) = true
+isnanormissing(::Missing) = true
 
 """
 Return `true` if value > 0, other cases - `false` (Missing, Nothing, NaN)
@@ -96,34 +96,54 @@ parse_gkw(s) = throw(ArgumentError("Argument should be String, Symbol or Abstrac
 
 #CV2se
 """
-    sdfromcv(cv::Real)::AbstractFloat
+    sdfromcv(cv)
 
 LnSD from CV.
+
+```math
+σ = \\sqrt{log(1 + CV^2)}
+```
 """
 function sdfromcv(cv)
     return sqrt(varfromcv(cv))
 end
 """
-    varfromcv(cv::Real)::AbstractFloat
+    varfromcv(cv)
 
 LnVariance from CV.
+
+
+```math
+σ^2 = log(1 + CV^2)
+```
+
 """
 function varfromcv(cv)
      return log(1 + cv^2)
 end
 """
-    cvfromvar(σ²::Real)::AbstractFloat
+    cvfromvar(σ²)
 
-CV from variance.
+CV from LnVariance.
+
+
+```math
+CV = \\sqrt{exp(σ^2) - 1}
+```
 """
 function cvfromvar(σ²)
     return sqrt(exp(σ²) - 1)
 end
 #CV2se
 """
-    cvfromsd(σ::Real)::AbstractFloat
+    cvfromsd(σ)
 
 CV from LnSD.
+
+
+```math
+CV = \\sqrt{exp(σ^2) - 1}
+```
 """
 function cvfromsd(σ)
     return sqrt(exp(σ^2) - 1)
