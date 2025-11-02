@@ -102,6 +102,9 @@ using Test, Tables, TypedTables, DataFrames, CSV
         exiddsv[i] = ExampleIDStruct(Dict(:a => 1, :b => 1))
     end
     exidds = MetidaBase.DataSet(exiddsv)
+
+    @test MetidaBase.idkeys(exidds) == Set([:a, :b])
+
     ############################################################################
     @test Tables.istable(exidds) == false
     @test Tables.rowaccess(exidds) == false
@@ -147,6 +150,8 @@ using Test, Tables, TypedTables, DataFrames, CSV
     # metadata
     dsmeta = MetidaBase.DataSet(exrsdsv, Dict(:name => "SomeName"))
 
+
+    
     # Index
     @test exrsds[:, :r1][1] == 3
     @test exrsds[1, :r1] == 3
